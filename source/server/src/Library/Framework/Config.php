@@ -24,7 +24,17 @@ function construct() {
 function init(array &$Config) {
     $Config[FIELD_DATA] = [];
 
-    foreach (glob(PROJECT_CONFIGURATION . '/*.php') as $file) {
+    foreach (glob(PROJECT_CONFIGURATION . '/' . ENVIRONMENT . '/*.php') as $file) {
         $Config[FIELD_DATA] += require_once($file);
     }
+}
+
+/**
+ * @param array $Config объект конфига
+ * @param string $item какой раздел конфига нужен
+ *
+ * @return array раздел конфига
+ */
+function get(array $Config, $item) {
+    return $Config[FIELD_DATA][$item];
 }

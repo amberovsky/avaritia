@@ -21,15 +21,15 @@ use Avaritia\Library\Framework\Response;
 use Avaritia\Library\Framework\Router;
 use Avaritia\Library\Framework\View;
 
-// Поля класса
-const
-    FIELD_SERVICE_MANAGER   = 'service_manager', /** сервис-менеджер */
-    FIELD_MODE              = 'mode'; /** режим запуска */
-
 // Режим запуска
 const
     MODE_WEB    = 0, /** запрос от веб-сервера */
     MODE_CLI    = 1; /** консольный запрос */
+
+// Поля класса
+const
+    FIELD_SERVICE_MANAGER   = 'service_manager', /** сервис-менеджер */
+    FIELD_MODE              = 'mode'; /** режим запуска */
 
 /**
  * @return array объект приложения
@@ -104,10 +104,12 @@ function run(array &$Application) {
      * У нас нет ни dispatch, ни forward, ни event, поэтому далее простой код
      */
 
+    // Объект запроса
     $Request = Request\construct();
+    ServiceManager\set($ServiceManager, 'Request', $Request);
 
     // Определим роутинг
-    $Router = Router\construct($Config, $Request);
+    $Router = Router\construct($Config, $Request, $Application);
     Router\match($Router);
 
     $controllerName = Router\getControllerName($Router);
@@ -117,10 +119,21 @@ function run(array &$Application) {
     require_once(PROJECT_SOURCE . '/Controller/' . $controllerName . '.php');
     $controllerNamespace = 'Avaritia\\Controller\\' . $controllerName . '\\';
 
+    // У контроллера должен быть конструктор
+    if (!function_exists($controllerNamespace . 'construct')) {
+        trigger_error('У контроллера [' . $controllerName . '] отсутствует конструктор');
+    }
+
     $Controller = call_user_func($controllerNamespace . 'construct');
 
+    // Полное имя функции экшена для вызова
+    $actionFunction = $controllerNamespace . $actionName . 'Action';
+    if (!function_exists($actionFunction)) {
+        trigger_error('У контроллера [' . $controllerName . '] отсутствует метод [' . $actionName . ']');
+    }
+
     // & у $Controller абсолютно легален
-    $View = call_user_func($controllerNamespace . $actionName . 'Action', [&$Controller]);
+    $View = call_user_func($actionFunction, [&$Controller]);
 
     // Объект ответа отрендерит и установит хедеры
     $Response = Response\construct();
