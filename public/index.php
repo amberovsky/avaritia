@@ -94,6 +94,8 @@ set_error_handler(function ($no, $str, $file, $line) {
     die();
 }, ERROR_REPORTING);
 
+// TODO Exception handler
+
 // Нормализация каталога - для cli
 chdir(realpath(__DIR__));
 

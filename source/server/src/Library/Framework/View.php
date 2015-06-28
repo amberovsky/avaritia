@@ -7,16 +7,16 @@
 
 namespace Avaritia\Library\Framework\View;
 
+// Тип стратегии рендеринга
+const
+    RENDER_STRATEGY_PLAIN   = 0, // plain рендеринг
+    RENDER_STRATEGY_JSON    = 1; // json рендеринг
+
 // Поля класса
 const
     FIELD_RENDER_STRATEGY   = 'render_strategy', /** стратегия рендеринга */
     FIELD_TEMPLATE_NAME     = 'template_name', /** шаблон рендеринга */
     FIELD_VARIABLES         = 'variables'; /** список переменных для шаблона */
-
-// Тип стратегии рендеринга
-const
-    RENDER_STRATEGY_PLAIN   = 0, // plain рендеринг
-    RENDER_STRATEGY_JSON    = 1; // json рендеринг
 
 /**
  * @return array объект отображения
@@ -24,6 +24,7 @@ const
 function construct() {
     $View = [];
     setRenderStrategy($View, RENDER_STRATEGY_PLAIN);
+    setVariables($View, []);
 
     return $View;
 }

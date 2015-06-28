@@ -7,11 +7,17 @@
 
 namespace Avaritia\Library\Framework\ServiceManager;
 
+// Поля класса
+const
+    FIELD_DATA  = 'data'; /** список сервисов */
+
 /**
  * @return array объект ServiceManager
  */
 function construct() {
-    return [];
+    return [
+        FIELD_DATA => [],
+    ];
 }
 
 /**
@@ -24,7 +30,7 @@ function construct() {
  * @return array объект сервис-менеджера
  */
 function set(array &$ServiceManager, $name, $value) {
-    $ServiceManager[$name] = $value;
+    $ServiceManager[FIELD_DATA][$name] = $value;
 
     return $ServiceManager;
 }
@@ -36,8 +42,8 @@ function set(array &$ServiceManager, $name, $value) {
  * @return mixed
  */
 function get(array $ServiceManager, $name) {
-    if (isset($ServiceManager[$name])) {
-        return $ServiceManager[$name];
+    if (isset($ServiceManager[FIELD_DATA][$name])) {
+        return $ServiceManager[FIELD_DATA][$name];
     } else {
         trigger_error('Значение [' . $name . '] не найдено в сервис-менеджере', E_USER_ERROR);
     }
