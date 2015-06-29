@@ -37,7 +37,7 @@ function &construct(array $pool) {
         );
     }
 
-    foreach(array_slice($pool, 1) as $server) {
+    foreach (array_slice($pool, 1) as $server) {
         memcache_add_server(
             $memcache,
             $server[MemcachedFactory\CONFIGURATION_HOST],

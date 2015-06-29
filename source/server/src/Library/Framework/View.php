@@ -25,6 +25,7 @@ function &construct() {
     $View = [];
     setRenderStrategy($View, RENDER_STRATEGY_PLAIN);
     setVariables($View, []);
+    setTemplateName($View, '');
 
     return $View;
 }
