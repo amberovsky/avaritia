@@ -14,10 +14,12 @@ use Avaritia\Library\Framework\Application;
 use Avaritia\Library\Framework\View;
 
 /**
- * @return array объект ответа
+ * @return &array объект ответа
  */
-function construct() {
-    return [];
+function &construct() {
+    $Response = [];
+
+    return $Response;
 }
 
 /**

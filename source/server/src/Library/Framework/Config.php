@@ -14,27 +14,30 @@ const
 /**
  * @return array объект конфига
  */
-function construct() {
-    return [];
-}
+function &construct() {
+    $Config = [];
 
-/**
- * @param array &$Config инициализация конфига
- */
-function init(array &$Config) {
     $Config[FIELD_DATA] = [];
 
+    // Глобальные конфиги
+    foreach (glob(PROJECT_CONFIGURATION . '/*.php') as $file) {
+        $Config[FIELD_DATA] += require_once($file);
+    }
+
+    // Конфиги в зависимости от текущего окружения
     foreach (glob(PROJECT_CONFIGURATION . '/' . ENVIRONMENT . '/*.php') as $file) {
         $Config[FIELD_DATA] += require_once($file);
     }
+
+    return $Config;
 }
 
 /**
  * @param array $Config объект конфига
  * @param string $item какой раздел конфига нужен
  *
- * @return array раздел конфига
+ * @return &array раздел конфига
  */
-function get(array $Config, $item) {
+function &get(array $Config, $item) {
     return $Config[FIELD_DATA][$item];
 }

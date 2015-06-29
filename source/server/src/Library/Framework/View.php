@@ -19,9 +19,9 @@ const
     FIELD_VARIABLES         = 'variables'; /** список переменных для шаблона */
 
 /**
- * @return array объект отображения
+ * @return &array объект отображения
  */
-function construct() {
+function &construct() {
     $View = [];
     setRenderStrategy($View, RENDER_STRATEGY_PLAIN);
     setVariables($View, []);
@@ -32,13 +32,9 @@ function construct() {
 /**
  * @param array &$View объект отображения
  * @param int $renderStrategy стратегия рендеринга
- *
- * @return array объект отображения
  */
 function setRenderStrategy(array &$View, $renderStrategy) {
     $View[FIELD_RENDER_STRATEGY] = (int) $renderStrategy;
-
-    return $View;
 }
 
 /**
@@ -53,13 +49,9 @@ function getRenderStrategy(array $View) {
 /**
  * @param array &$View объект отображения
  * @param string $templateName имя шаблона для рендеринга
- *
- * @return array объект отображения
  */
 function setTemplateName(array &$View, $templateName) {
     $View[FIELD_TEMPLATE_NAME] = $templateName;
-
-    return $View;
 }
 
 /**
@@ -74,13 +66,9 @@ function getTemplateName(array $View) {
 /**
  * @param array &$View объект отображения
  * @param array $variables список перменных для шаблона
- *
- * @return array объект отображения
  */
 function setVariables(array &$View, array $variables) {
     $View[FIELD_VARIABLES] = $variables;
-
-    return $View;
 }
 
 /**
@@ -105,8 +93,11 @@ function renderJson(array $View) {
         JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE);
 
     if (($result === false) || (json_last_error() != JSON_ERROR_NONE)) {
-        trigger_error('Ошибка конвертации ответа в json. Код [' . json_last_error() . '], сообщение [' .
-            json_last_error_msg() . ']');
+        trigger_error(
+            'Ошибка конвертации ответа в json. Код [' . json_last_error() . '], сообщение [' .
+                json_last_error_msg() . ']',
+            E_USER_ERROR
+        );
     }
 
     return $result;

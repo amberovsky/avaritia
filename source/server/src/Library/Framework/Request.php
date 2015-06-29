@@ -21,9 +21,9 @@ const
     FIELD_DOCUMENT_URI  = 'request_uri'; /** document uri запроса */
 
 /**
- * @return array объект запроса
+ * @return &array объект запроса
  */
-function construct() {
+function &construct() {
     $Request = [];
 
     setQuery($Request, isset($_GET) ? $_GET : []);
