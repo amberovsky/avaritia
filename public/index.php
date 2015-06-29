@@ -25,7 +25,10 @@ ob_start(function ($buffer) {
     }
 
     if (php_sapi_name() == 'cli') {
-        return 'Ошибка' . PHP_EOL . print_r($error, true) . PHP_EOL . print_r(debug_backtrace(), true) . PHP_EOL;
+        $errorMsg = defined('THREAD_ID') ? ('[' . THREAD_ID . '] ') : '';
+
+        return $errorMsg . 'Ошибка' . PHP_EOL . print_r($error, true) . PHP_EOL . print_r(debug_backtrace(), true) .
+            PHP_EOL;
     } else {
         http_response_code(500);
 
@@ -65,11 +68,11 @@ set_error_handler(function ($no, $str, $file, $line) {
         return false;
     }
 
-    $errorMsg = 'Ошибка [' . $str . '] уровня [' . $no . '] файл [' . $file . '] строка [' . $line . ']' . PHP_EOL .
-        print_r(debug_backtrace(), true) . PHP_EOL;
+    $errorMsg = defined('THREAD_ID') ? ('[' . THREAD_ID . '] ') : '';
+    $errorMsg .= 'Ошибка [' . $str . '] уровня [' . $no . '] файл [' . $file . '] строка [' . $line . ']' . PHP_EOL;
 
     // Логируем куда-нибудь безопасно
-    error_log($errorMsg);
+    error_log($errorMsg . print_r(debug_backtrace(), true) . PHP_EOL);
 
     if (php_sapi_name() == 'cli') {
         echo $errorMsg;

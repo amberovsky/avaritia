@@ -7,7 +7,8 @@
 -   php >= 5.4
 -   nginx
 -   php-fpm (с пробросом DOCUMENT_URI)
-
+-   php5-memcache
+-   memcached
 
 ## Настройка
 
@@ -16,6 +17,7 @@
 -   ```bash
     short_open_tag = On
     ```
+    
 -   Ошибки обрабатываются через trigger_error
     ```bash
     error_log = /path/to/whatever

@@ -12,10 +12,12 @@ load('Avaritia\Library\Framework\View');
 use Avaritia\Library\Framework\View;
 
 /**
- * @return array объект контроллера
+ * @return &array объект контроллера
  */
-function construct() {
-    return [];
+function &construct() {
+    $Customer = [];
+
+    return $Customer;
 }
 
 /**
@@ -23,8 +25,11 @@ function construct() {
  *
  * @param array &$Controller объект контроллера
  *
- * @return array объект отображения
+ * @return &array объект отображения
  */
-function indexAction(array &$Controller) {
-    return View\setTemplateName(View\construct(), 'customer\index');
+function &indexAction(array &$Controller) {
+    $View = &View\construct();
+    View\setTemplateName($View, 'customer\index');
+
+    return $View;
 }
