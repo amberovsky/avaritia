@@ -15,9 +15,9 @@ const
  * @return array объект конфига
  */
 function &construct() {
-    $Config = [];
-
-    $Config[FIELD_DATA] = [];
+    $Config = [
+        FIELD_DATA  => [],
+    ];
 
     // Глобальные конфиги
     foreach (glob(PROJECT_CONFIGURATION . '/*.php') as $file) {

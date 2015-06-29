@@ -97,8 +97,8 @@ function &create(array &$MemcachedFactory, $name) {
 
     if (!isset($Instances[$name])) {
         $config = getConfig($MemcachedFactory);
-        if (!isset($config)) {
-            trigger_error('Отсутствет конфигурация для мемкеша [' . $name . ']', E_USER_ERROR);
+        if (!isset($config[$name])) {
+            trigger_error('Отсутствует конфигурация для мемкеша [' . $name . ']', E_USER_ERROR);
         }
 
         $Instances[$name] = Memcached\construct($config[$name]);
