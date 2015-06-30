@@ -37,7 +37,7 @@ function &construct(array &$Config) {
     $ServiceManager = [
         FIELD_CONFIG    => $smConfig,
         FIELD_DATA      => [
-            'Config'    => $Config,
+            'Config'    => &$Config,
         ],
         FIELD_FACTORIES => [],
     ];
@@ -64,7 +64,7 @@ function getConfig(array $ServiceManager) {
  * @param mixed $value значение
  */
 function set(array &$ServiceManager, $name, $value) {
-    $ServiceManager[FIELD_DATA][$name] = $value;
+    $ServiceManager[FIELD_DATA][$name] = &$value;
 }
 
 /**

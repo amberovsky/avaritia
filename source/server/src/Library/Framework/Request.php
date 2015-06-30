@@ -18,7 +18,9 @@ const
     FIELD_POST          = 'post', /** данные post запроса */
     FIELD_SERVER        = 'server', /** данные массива $_SERVER */
     FIELD_METHOD        = 'method', /** метод HTTP запроса */
-    FIELD_DOCUMENT_URI  = 'request_uri'; /** document uri запроса */
+    FIELD_DOCUMENT_URI  = 'request_uri', /** document uri запроса */
+    FIELD_ARGC          = 'argc', /** количество параметров в cli запросе */
+    FIELD_ARGV          = 'argv'; /** параметры cli запроса */
 
 /**
  * @return &array объект запроса
@@ -30,7 +32,46 @@ function &construct() {
     setPost($Request, isset($_POST) ? $_POST : []);
     setServer($Request, $_SERVER);
 
+    global $argc, $argv;
+
+    setArgc($Request, isset($argc) ? $argc : 0);
+    setArgv($Request, isset($argv) ? $argv : []);
+
     return $Request;
+}
+
+/**
+ * @param array &$Request объект запроса
+ * @param int $argc количество аргументов при запуске
+ */
+function setArgc(array &$Request, $argc) {
+    $Request[FIELD_ARGC] = (int) $argc;
+}
+
+/**
+ * @param array $Request объект запроса
+ *
+ * @return int количество аргументов при запуске
+ */
+function getArgc(array $Request) {
+    return $Request[FIELD_ARGC];
+}
+
+/**
+ * @param array &$Request объект запроса
+ * @param array $argv аргументы при запуске
+ */
+function setArgv(array &$Request, array $argv) {
+    $Request[FIELD_ARGV] = $argv;
+}
+
+/**
+ * @param array $Request объект запроса
+ *
+ * @return array аргументы при запуске
+ */
+function getArgv(array $Request) {
+    return $Request[FIELD_ARGV];
 }
 
 /**

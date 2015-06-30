@@ -12,7 +12,7 @@ use Avaritia\Library\Framework\ServiceManager;
 return [
     ServiceManager\CONFIGURATION_SECTION    => [
         ServiceManager\CONFIGURATION_FACTORIES  => [
-            'Memcached' => 'Avaritia\Library\MemcachedFactory',
+            'Memcached' => 'Avaritia\Library\Memcached\MemcachedFactory',
             'Mysql'     => 'Avaritia\Library\Mysql\MysqlFactory',
         ],
     ],
