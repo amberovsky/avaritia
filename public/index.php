@@ -27,8 +27,8 @@ ob_start(function ($buffer) {
     if (php_sapi_name() == 'cli') {
         $errorMsg = defined('THREAD_ID') ? ('[' . THREAD_ID . '] ') : '';
 
-        return $errorMsg . 'Ошибка' . PHP_EOL . print_r($error, true) . PHP_EOL . print_r(debug_backtrace(), true) .
-            PHP_EOL;
+        return $errorMsg . 'Ошибка' . PHP_EOL . var_export($error, true) . PHP_EOL .
+            var_export(debug_backtrace(), true) . PHP_EOL;
     } else {
         http_response_code(500);
 

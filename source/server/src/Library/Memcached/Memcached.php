@@ -5,11 +5,11 @@
  * Memcache
  */
 
-namespace Avaritia\Library\Memcached;
+namespace Avaritia\Library\Memcached\Memcached;
 
-load('Avaritia\Library\MemcachedFactory');
+load('Avaritia\Library\Memcached\MemcachedFactory');
 
-use Avaritia\Library\MemcachedFactory;
+use Avaritia\Library\Memcached\MemcachedFactory;
 
 // Поля класса
 const
@@ -65,6 +65,8 @@ function &getMemcacheObject(array $Memcached) {
 }
 
 /**
+ * @link http://php.net/manual/ru/memcache.set.php
+ *
  * @param array $Memcached объект мемкеша
  * @param string $key имя ключа сохранения
  * @param mixed $var значение ключа
@@ -78,6 +80,8 @@ function set(array $Memcached, $key, $var, $flag = null, $expire = 0) {
 }
 
 /**
+ * @link http://php.net/manual/ru/memcache.get.php
+ *
  * @param array $Memcached объект мемкеша
  * @param string|array $keys ключ(и) для выборки
  * @param array|null $flags см документацию
@@ -86,4 +90,17 @@ function set(array $Memcached, $key, $var, $flag = null, $expire = 0) {
  */
 function get(array $Memcached, $keys, array $flags = null) {
     return memcache_get(getMemcacheObject($Memcached), $keys, $flags);
+}
+
+/**
+ * @see http://php.net/manual/ru/memcache.increment.php
+ *
+ * @param array $Memcached объект мемкеша
+ * @param string $key ключ инкремента
+ * @param int   $value стартовое значение
+ *
+ * @return int|bool новое значение ключа или false при ошибке
+ */
+function increment(array $Memcached, $key, $value = 1) {
+    return memcache_increment(getMemcacheObject($Memcached), $key, $value);
 }

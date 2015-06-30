@@ -61,7 +61,7 @@ function getMysqlLink(array &$Mysql) {
             trigger_error('Ошибка соедения с mysql [' . mysql_error() . '] ' . print_r($config, true));
         }
 
-        mysql_query('SET NAMES UTF-8', $Mysql[FIELD_MYSQL_LINK]);
+        mysql_query('SET NAMES utf8', $Mysql[FIELD_MYSQL_LINK]);
         mysql_select_db($config[MysqlFactory\CONFIGURATION_DATABASE], $Mysql[FIELD_MYSQL_LINK]);
     }
 
@@ -77,7 +77,16 @@ function getMysqlLink(array &$Mysql) {
  * @return resource|bool результат выполниния
  */
 function query(array &$Mysql, $query) {
-    return mysql_query($query, getMysqlLink($Mysql));
+    $mysqlLink = getMysqlLink($Mysql);
+
+    $result = mysql_query($query, $mysqlLink);
+
+    if ($result === false) {
+        trigger_error('Ошибка запроса mysql. Код [' . mysql_errno($mysqlLink) . '], текст [' .
+            mysql_error($mysqlLink) . ']');
+    }
+
+    return $result;
 }
 
 /**
@@ -86,7 +95,7 @@ function query(array &$Mysql, $query) {
  * @param array &$Mysql объект инстанса mysql
  * @param resource $result результат mysql_query
  *
- * @return array|bool результат выполниния
+ * @return array|bool результат выполнения
  */
 function fetchAssoc(array &$Mysql, $result) {
     return mysql_fetch_assoc($result);

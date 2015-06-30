@@ -17,6 +17,14 @@ date_default_timezone_set('UTC');
 // Все кодировки - в UTF-8
 mb_internal_encoding('UTF-8');
 
+// Локаль - en_US UTF-8
+setlocale(LC_ALL, 'en_US.UTF-8');
+
+// Работает только на 64-битных системах
+if (PHP_INT_SIZE != 8) {
+    trigger_error('Разрешён запуск только на 64-битных системах', E_USER_ERROR);
+}
+
 // Время запуска
 $timeStart = explode(' ', microtime());
 $timeStart = [

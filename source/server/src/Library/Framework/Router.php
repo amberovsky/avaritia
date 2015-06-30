@@ -77,8 +77,8 @@ function &construct(array &$Config, array &$Request, array &$Application) {
 
     $Router = [
         FIELD_CONFIG            => $config,
-        FIELD_REQUEST           => $Request,
-        FIELD_APPLICATION       => $Application,
+        FIELD_REQUEST           => &$Request,
+        FIELD_APPLICATION       => &$Application,
         FIELD_ACTION_NAME       => '',
         FIELD_CONTROLLER_NAME   => '',
     ];
@@ -125,14 +125,20 @@ function &getApplication(array $Router) {
  * @param array &$Router объект роута
  */
 function match(array &$Router) {
+    $Request = &getRequest($Router);
+
     switch (Application\getMode(getApplication($Router))) {
-        case Application\MODE_CLI:
-            // TODO сделать матчинг cli режима
-            trigger_error('TODO', E_USER_ERROR);
+        case Application\MODE_CLI: // Запрос в cli-режиме
+            if (Request\getArgc($Request) < 3) {
+                trigger_error('Отсутствует имя скрипта', E_USER_ERROR);
+            }
+
+            setControllerName($Router, Request\getArgv($Request)[1]);
+            setActionName($Router, 'run');
             break;
 
-        case Application\MODE_WEB:
-            $documentUri = Request\getDocumentUri(getRequest($Router));
+        case Application\MODE_WEB: // Запрос в web-режиме
+            $documentUri = Request\getDocumentUri($Request);
             $matches = explode('/', trim(strtolower($documentUri), '/'));
             $count = count($matches);
 
@@ -148,8 +154,8 @@ function match(array &$Router) {
             // Проходим по списку роутов и матчим подходящий
             foreach (getConfig($Router)[CONFIGURATION_WEB] as $name => $data) {
                 if ($data[CONFIGURATION_PATTERN] === $pattern) {
-                    $Router[FIELD_CONTROLLER_NAME] = $data[CONFIGURATION_CONTROLLER];
-                    $Router[FIELD_ACTION_NAME] = ($count == 1) ? $data[CONFIGURATION_DEFAULT_ACTION] : $matches[1];
+                    setControllerName($Router, $data[CONFIGURATION_CONTROLLER]);
+                    setActionName($Router, ($count == 1) ? $data[CONFIGURATION_DEFAULT_ACTION] : $matches[1]);
 
                     $found = true;
                     break;
@@ -166,12 +172,28 @@ function match(array &$Router) {
 }
 
 /**
+ * @param array &$Router объект роута
+ * @param string $name имя сматченного контроллера
+ */
+function setControllerName(array &$Router, $name) {
+    $Router[FIELD_CONTROLLER_NAME] = $name;
+}
+
+/**
  * @param array $Router объект роута
  *
  * @return string имя контроллера
  */
 function getControllerName(array $Router) {
     return $Router[FIELD_CONTROLLER_NAME];
+}
+
+/**
+ * @param array &$Router объект роута
+ * @param string $name имя сматченного экшена
+ */
+function setActionName(array &$Router, $name) {
+    $Router[FIELD_ACTION_NAME] = $name;
 }
 
 /**

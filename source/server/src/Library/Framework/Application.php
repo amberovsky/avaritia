@@ -112,7 +112,7 @@ function run(array &$Application) {
     $actionName = Router\getActionName($Router);
 
     // Создадим контроллер, вызовем action
-    require_once(PROJECT_SOURCE . '/Controller/' . $controllerName . '.php');
+    load('Avaritia\Controller\\' . $controllerName);
     $controllerNamespace = 'Avaritia\\Controller\\' . $controllerName . '\\';
 
     // У контроллера должен быть конструктор
@@ -120,7 +120,7 @@ function run(array &$Application) {
         trigger_error('У контроллера [' . $controllerName . '] отсутствует конструктор', E_USER_ERROR);
     }
 
-    $Controller = &call_user_func($controllerNamespace . 'construct');
+    $Controller = &call_user_func_array($controllerNamespace . 'construct', [&$ServiceManager]);
 
     // Полное имя функции экшена для вызова
     $actionFunction = $controllerNamespace . $actionName . 'Action';
@@ -128,10 +128,15 @@ function run(array &$Application) {
         trigger_error('У контроллера [' . $controllerName . '] отсутствует метод [' . $actionName . ']', E_USER_ERROR);
     }
 
-    // & у $Controller абсолютно легален
-    $View = &call_user_func_array($actionFunction, [&$Controller]);
+    if (getMode($Application) == MODE_WEB) {
+        // & у $Controller абсолютно легален
+        $View = &call_user_func_array($actionFunction, [&$Controller]);
 
-    // Объект ответа отрендерит и установит хедеры
-    $Response = &Response\construct();
-    echo Response\toString($Response, $Application, $View);
+        // Объект ответа отрендерит и установит хедеры
+        $Response = &Response\construct();
+        echo Response\toString($Response, $Application, $View);
+    } else {
+        // TODO подумать как сделать через Response, раз уж dispatch нет
+        call_user_func_array($actionFunction, [&$Controller]);
+    }
 }

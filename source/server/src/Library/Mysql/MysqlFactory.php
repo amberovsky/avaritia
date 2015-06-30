@@ -151,10 +151,19 @@ function &create(array &$MysqlFactory, $name) {
             trigger_error('Отсутствет конфигурация для mysql [' . $name . ']', E_USER_ERROR);
         }
 
-        $Instances[$name] = Mysql\construct($config[$name]);
+        $Instances[$name] = &Mysql\construct($config[$name]);
     }
 
     return $Instances[$name];
+}
+
+/**
+ * @param array $MysqlFactory объект фабрики mysql
+ *
+ * @return array конфигурация шардов
+ */
+function getShardsConfig(array $MysqlFactory) {
+    return getConfig($MysqlFactory)[CONFIGURATION_SHARD_INSTANCES];
 }
 
 /**
@@ -166,18 +175,17 @@ function &create(array &$MysqlFactory, $name) {
  */
 function &createShard(array &$MysqlFactory, $name, $shardId) {
     $ShardInstances = &getShardInstances($MysqlFactory);
+    $shardsConfig = getShardsConfig($MysqlFactory);
 
     if (!isset($ShardInstances[$name][$shardId])) {
-        $config = getConfig($MysqlFactory);
-
-        if (!isset($config[CONFIGURATION_SHARD_INSTANCES][$name][$shardId])) {
+        if (!isset($shardsConfig[$name][$shardId])) {
             trigger_error(
                 'Отсутствет шардовая конфигурация [' . $shardId . '] для mysql [' . $name . ']',
                 E_USER_ERROR
             );
         }
 
-        $ShardInstances[$name][$shardId] = Mysql\construct($config[CONFIGURATION_SHARD_INSTANCES][$name][$shardId]);
+        $ShardInstances[$name][$shardId] = &Mysql\construct($shardsConfig[$name][$shardId]);
     }
 
     return $ShardInstances[$name][$shardId];

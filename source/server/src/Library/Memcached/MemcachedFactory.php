@@ -5,15 +5,15 @@
  * Фабрика мемкешей
  */
 
-namespace Avaritia\Library\MemcachedFactory;
+namespace Avaritia\Library\Memcached\MemcachedFactory;
 
 load('Avaritia\Library\Framework\ServiceManager');
 load('Avaritia\Library\Framework\Config');
-load('Avaritia\Library\Memcached');
+load('Avaritia\Library\Memcached\Memcached');
 
 use Avaritia\Library\Framework\ServiceManager;
 use Avaritia\Library\Framework\Config;
-use Avaritia\Library\Memcached;
+use Avaritia\Library\Memcached\Memcached;
 
 // Константы конфигурирования мемкеша
 const
@@ -101,7 +101,7 @@ function &create(array &$MemcachedFactory, $name) {
             trigger_error('Отсутствует конфигурация для мемкеша [' . $name . ']', E_USER_ERROR);
         }
 
-        $Instances[$name] = Memcached\construct($config[$name]);
+        $Instances[$name] = &Memcached\construct($config[$name]);
     }
 
     return $Instances[$name];
