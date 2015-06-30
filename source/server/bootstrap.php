@@ -48,6 +48,9 @@ if (!is_dir($configurationDir)) {
     trigger_error('Нет такого каталога с настройками [' . $configurationDir . ']', E_USER_ERROR);
 }
 
+// Установление ревизии
+require PROJECT_CONFIGURATION . '/revision.php';
+
 /**
  * Используется для подгрузки классов в неймспейсе.
  * После вызова разумно написать use чтобы не тащить гирлянду пути везде.

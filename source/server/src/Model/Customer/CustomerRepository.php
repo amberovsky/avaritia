@@ -240,7 +240,21 @@ function &create(array $CustomerRepository, $login, $fio, $password) {
 
     saveToMemcached($CustomerRepository, $Customer);
     savePasswordHashToMemcached($CustomerRepository, $Customer, $passwordHash);
-    createInMysql($CustomerRepository, $Customer, $password);
+    createInMysql($CustomerRepository, $Customer, $passwordHash);
 
     return $Customer;
+}
+
+/**
+ * @param array &$CustomerRepository объект репозитория заказчика
+ * @param string $login логин заказчика
+ * @param string $password пароль заказчика
+ *
+ * @return bool верный ли пароль
+ */
+function validateAuth(array &$CustomerRepository, $login, $password) {
+    return Password\check(
+        $password,
+        Memcached\get(getMemcached($CustomerRepository), createMemcachedKeyForPasswordHash($login))
+    );
 }

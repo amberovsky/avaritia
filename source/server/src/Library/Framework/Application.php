@@ -13,6 +13,9 @@ load('Avaritia\Library\Framework\Request');
 load('Avaritia\Library\Framework\Response');
 load('Avaritia\Library\Framework\Router');
 load('Avaritia\Library\Framework\View');
+load('Avaritia\Library\Session');
+load('Avaritia\Library\Memcached\MemcachedFactory');
+load('Avaritia\Model\Customer\CustomerRepository');
 
 use Avaritia\Library\Framework\ServiceManager;
 use Avaritia\Library\Framework\Config;
@@ -20,6 +23,9 @@ use Avaritia\Library\Framework\Request;
 use Avaritia\Library\Framework\Response;
 use Avaritia\Library\Framework\Router;
 use Avaritia\Library\Framework\View;
+use Avaritia\Library\Session;
+use Avaritia\Library\Memcached\MemcachedFactory;
+use Avaritia\Model\Customer\CustomerRepository;
 
 // Режим запуска
 const
@@ -28,20 +34,29 @@ const
 
 // Поля класса
 const
-    FIELD_SERVICE_MANAGER   = 'service_manager', /** сервис-менеджер */
+    FIELD_SERVICE_MANAGER   = 'Service_Manager', /** сервис-менеджер */
     FIELD_MODE              = 'mode'; /** режим запуска */
 
 /**
- * @return array объект приложения
+ * @return &array объект приложения
  */
 function &construct() {
     $Application = [];
     setMode($Application, (php_sapi_name() == 'cli') ? MODE_CLI : MODE_WEB);
 
-    $ServiceManager = ServiceManager\construct(Config\construct());
+    $ServiceManager = &ServiceManager\construct(Config\construct());
     ServiceManager\set($ServiceManager, 'Application', $Application);
-
     setServiceManager($Application, $ServiceManager);
+
+    Session\init(MemcachedFactory\create(ServiceManager\getFactory($ServiceManager, 'Memcached'), 'session'));
+
+    // Объект запроса
+    $Request = &Request\construct();
+    ServiceManager\set($ServiceManager, 'Request', $Request);
+
+    // Объект ответа
+    $Response = &Response\construct($ServiceManager);
+    ServiceManager\set($ServiceManager, 'Response', $Response);
 
     return $Application;
 }
@@ -49,13 +64,9 @@ function &construct() {
 /**
  * @param array &$Application объект приложения
  * @param int $mode режим запуска
- *
- * @return &array объект приложения
  */
-function &setMode(array &$Application, $mode) {
+function setMode(array &$Application, $mode) {
     $Application[FIELD_MODE] = (int) $mode;
-
-    return $Application;
 }
 
 /**
@@ -70,13 +81,9 @@ function getMode(array $Application) {
 /**
  * @param array &$Application объект приложения
  * @param array &$ServiceManager объект сервис-менеджера
- *
- * @return &array объект отображения
  */
-function &setServiceManager(array &$Application, array &$ServiceManager) {
-    $Application[FIELD_SERVICE_MANAGER] = $ServiceManager;
-
-    return $Application;
+function setServiceManager(array &$Application, array &$ServiceManager) {
+    $Application[FIELD_SERVICE_MANAGER] = &$ServiceManager;
 }
 
 /**
@@ -100,16 +107,49 @@ function run(array &$Application) {
      * У нас нет ни dispatch, ни forward, ни event, поэтому далее простой код
      */
 
-    // Объект запроса
-    $Request = &Request\construct();
-    ServiceManager\set($ServiceManager, 'Request', $Request);
-
     // Определим роутинг
-    $Router = &Router\construct(ServiceManager\get($ServiceManager, 'Config'), $Request, $Application);
+    $Router = &Router\construct(
+        ServiceManager\get($ServiceManager, 'Config'),
+        ServiceManager\get($ServiceManager, 'Request'),
+        $Application
+    );
     Router\match($Router);
 
     $controllerName = Router\getControllerName($Router);
     $actionName = Router\getActionName($Router);
+    $routeName = Router\getRouteName($Router);
+
+    if ($routeName === 'root') {
+        header('Location: /index', true, 307);
+        return;
+    }
+
+    $ActiveUser = null;
+    $userData = Session\getActiveUserData();
+    if (!is_null($userData)) {
+        if ($userData[1] == 'customer') {
+            // Заказчик
+            if (($routeName !== 'customer') && (($routeName !== 'index') || ($actionName !== 'logout'))) {
+                header('Location: /customer', true, 307);
+                return;
+            }
+
+            $CustomerRepository = &CustomerRepository\construct(
+                MemcachedFactory\create(ServiceManager\getFactory($ServiceManager, 'Memcached'), 'cache'),
+                ServiceManager\getFactory($ServiceManager, 'Mysql')
+            );
+
+            $ActiveUser = &CustomerRepository\fetch($CustomerRepository, $userData[0]);
+        } else {
+            // Исполнитель
+        }
+    } else {
+        if ($routeName !== 'index') {
+            header('Location: /index', true, 307);
+            return;
+        }
+    }
+    ServiceManager\set($ServiceManager, 'ActiveUser', $ActiveUser);
 
     // Создадим контроллер, вызовем action
     load('Avaritia\Controller\\' . $controllerName);
@@ -125,18 +165,12 @@ function run(array &$Application) {
     // Полное имя функции экшена для вызова
     $actionFunction = $controllerNamespace . $actionName . 'Action';
     if (!function_exists($actionFunction)) {
-        trigger_error('У контроллера [' . $controllerName . '] отсутствует метод [' . $actionName . ']', E_USER_ERROR);
+        header('HTTP/1.0 404 Not Found');
+        exit();
     }
 
-    if (getMode($Application) == MODE_WEB) {
-        // & у $Controller абсолютно легален
-        $View = &call_user_func_array($actionFunction, [&$Controller]);
+    $View = &call_user_func_array($actionFunction, [&$Controller]);
+    ServiceManager\set($ServiceManager, 'View', $View);
 
-        // Объект ответа отрендерит и установит хедеры
-        $Response = &Response\construct();
-        echo Response\toString($Response, $Application, $View);
-    } else {
-        // TODO подумать как сделать через Response, раз уж dispatch нет
-        call_user_func_array($actionFunction, [&$Controller]);
-    }
+    echo Response\toString(ServiceManager\get($ServiceManager, 'Response'));
 }
