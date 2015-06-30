@@ -52,14 +52,31 @@ function &getServiceManager(array $Response) {
  */
 function toStringWeb(array &$Response) {
     $View = &ServiceManager\get(getServiceManager($Response), 'View');
+    $render = View\render($View);
 
     if (View\getRenderStrategy($View) == View\RENDER_STRATEGY_JSON) {
         header('Content-Type: application/json; charset=utf-8');
+
+        $render = json_encode(
+            [
+                'revision'  => REVISION,
+                'response'  => $render,
+            ],
+            JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE);
+
+        if (($render === false) || (json_last_error() != JSON_ERROR_NONE)) {
+            trigger_error(
+                'Ошибка конвертации ответа в json. Код [' . json_last_error() . '], сообщение [' .
+                json_last_error_msg() . ']',
+                E_USER_ERROR
+            );
+        }
+
     } else {
         header('Content-Type: text/html; charset=utf-8');
     }
 
-    return View\render($View);
+    return $render;
 }
 
 /**

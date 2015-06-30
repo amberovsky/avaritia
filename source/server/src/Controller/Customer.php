@@ -9,9 +9,15 @@ namespace Avaritia\Controller\Customer;
 
 load('Avaritia\Library\Framework\View');
 load('Avaritia\Library\Framework\ServiceManager');
+load('Avaritia\Library\Framework\Request');
+load('Avaritia\Library\Mysql\MysqlFactory');
+load('Avaritia\Model\Order\OrderRepository');
 
 use Avaritia\Library\Framework\View;
 use Avaritia\Library\Framework\ServiceManager;
+use Avaritia\Library\Framework\Request;
+use Avaritia\Library\Mysql\MysqlFactory;
+use Avaritia\Model\Order\OrderRepository;
 
 // Поля класса
 const
@@ -74,4 +80,36 @@ function &indexAction(array &$Controller) {
     );
 
     return $View;
+}
+
+/**
+ * Запрос на добавление заказа
+ *
+ * @param array &$Controller объект котнроллера
+ *
+ * @return array
+ */
+function cmdAdd(array &$Controller) {
+    $Request = &getRequest($Controller);
+
+    $price = (int) Request\getPostParam($Request, 'price');
+    $text = Request\getPostParam($Request, 'text');
+
+    if (($price < 1) || (mb_strlen($text) == 0) || (mb_strlen($text) > 1024)) {
+        return [
+            'error_msg' => 'Неверные данные',
+        ];
+    }
+
+    $OrderRepository = &OrderRepository\construct(
+        MysqlFactory\create(ServiceManager\getFactory(getServiceManager($Controller), 'Mysql'), 'order')
+    );
+
+    if (OrderRepository\create($OrderRepository, $price, $text) === false) {
+        return [
+            'error_msg' => 'Ошибка создания запроса',
+        ];
+    } else {
+        return [];
+    }
 }

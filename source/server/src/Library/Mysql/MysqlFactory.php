@@ -151,7 +151,7 @@ function &create(array &$MysqlFactory, $name) {
             trigger_error('Отсутствет конфигурация для mysql [' . $name . ']', E_USER_ERROR);
         }
 
-        $Instances[$name] = &Mysql\construct($config[$name]);
+        $Instances[$name] = &Mysql\construct($config[CONFIGURATION_INSTANCES][$name]);
     }
 
     return $Instances[$name];

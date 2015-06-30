@@ -165,10 +165,9 @@ function createInMysql(array $CustomerRepository, array $Customer, $passwordHash
           \'' . mysql_real_escape_string(Customer\getId($Customer)) . '\',
           \'' . mysql_real_escape_string(Customer\getLogin($Customer)) . '\',
           \'' . mysql_real_escape_string(Customer\getFio($Customer)) . '\',
-          \'' . mysql_real_escape_string($passwordHash) . '\'
+          \'' . $passwordHash . '\'
         )
-    '
-    );
+    ');
 }
 
 /**

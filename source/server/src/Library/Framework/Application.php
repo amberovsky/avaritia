@@ -119,37 +119,39 @@ function run(array &$Application) {
     $actionName = Router\getActionName($Router);
     $routeName = Router\getRouteName($Router);
 
-    if ($routeName === 'root') {
-        header('Location: /index', true, 307);
-        return;
-    }
-
-    $ActiveUser = null;
-    $userData = Session\getActiveUserData();
-    if (!is_null($userData)) {
-        if ($userData[1] == 'customer') {
-            // Заказчик
-            if (($routeName !== 'customer') && (($routeName !== 'index') || ($actionName !== 'logout'))) {
-                header('Location: /customer', true, 307);
-                return;
-            }
-
-            $CustomerRepository = &CustomerRepository\construct(
-                MemcachedFactory\create(ServiceManager\getFactory($ServiceManager, 'Memcached'), 'cache'),
-                ServiceManager\getFactory($ServiceManager, 'Mysql')
-            );
-
-            $ActiveUser = &CustomerRepository\fetch($CustomerRepository, $userData[0]);
-        } else {
-            // Исполнитель
-        }
-    } else {
-        if ($routeName !== 'index') {
+    if (getMode($Application) === MODE_WEB) {
+        if ($routeName === 'root') {
             header('Location: /index', true, 307);
             return;
         }
+
+        $ActiveUser = null;
+        $userData = Session\getActiveUserData();
+        if (!is_null($userData)) {
+            if ($userData[1] == 'customer') {
+                // Заказчик
+                if (($routeName !== 'customer') && (($routeName !== 'index') || ($actionName !== 'logout'))) {
+                    header('Location: /customer', true, 307);
+                    return;
+                }
+
+                $CustomerRepository = &CustomerRepository\construct(
+                    MemcachedFactory\create(ServiceManager\getFactory($ServiceManager, 'Memcached'), 'cache'),
+                    ServiceManager\getFactory($ServiceManager, 'Mysql')
+                );
+
+                $ActiveUser = &CustomerRepository\fetch($CustomerRepository, $userData[0]);
+            } else {
+                // Исполнитель
+            }
+        } else {
+            if ($routeName !== 'index') {
+                header('Location: /index', true, 307);
+                return;
+            }
+        }
+        ServiceManager\set($ServiceManager, 'ActiveUser', $ActiveUser);
     }
-    ServiceManager\set($ServiceManager, 'ActiveUser', $ActiveUser);
 
     // Создадим контроллер, вызовем action
     load('Avaritia\Controller\\' . $controllerName);
@@ -162,14 +164,24 @@ function run(array &$Application) {
 
     $Controller = &call_user_func_array($controllerNamespace . 'construct', [&$ServiceManager]);
 
+    $Request = &ServiceManager\get($ServiceManager, 'Request');
+
     // Полное имя функции экшена для вызова
-    $actionFunction = $controllerNamespace . $actionName . 'Action';
+    $actionFunction = $controllerNamespace .
+        (Request\isXmlHttpRequest($Request) ? ('cmd' . ucfirst($actionName)) : ($actionName . 'Action'));
+
     if (!function_exists($actionFunction)) {
         header('HTTP/1.0 404 Not Found');
         exit();
     }
 
-    $View = &call_user_func_array($actionFunction, [&$Controller]);
+    if (Request\isXmlHttpRequest($Request)) { // ajax запросы просто возвращают массив данных
+        $View = &View\construct();
+        View\setVariables($View, call_user_func_array($actionFunction, [&$Controller]));
+    } else {
+        $View = &call_user_func_array($actionFunction, [&$Controller]);
+    }
+
     ServiceManager\set($ServiceManager, 'View', $View);
 
     echo Response\toString(ServiceManager\get($ServiceManager, 'Response'));

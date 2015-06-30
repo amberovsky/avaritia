@@ -11,11 +11,13 @@ load('Avaritia\Library\Framework\ServiceManager');
 load('Avaritia\Library\Memcached\MemcachedFactory');
 load('Avaritia\Library\Mysql\MysqlFactory');
 load('Avaritia\Model\Customer\CustomerRepository');
+load('Avaritia\Model\Order\OrderRepository');
 
 use Avaritia\Library\Framework\ServiceManager;
 use Avaritia\Library\Memcached\MemcachedFactory;
 use Avaritia\Library\Mysql\MysqlFactory;
 use Avaritia\Model\Customer\CustomerRepository;
+use Avaritia\Model\Order\OrderRepository;
 
 /**
  * Запуск скрипта
@@ -40,4 +42,8 @@ function run(array &$ServiceManager) {
     // Два тестовых заказчика
     CustomerRepository\create($CustomerRepository, 'customer_1', 'Петров', '8anbAw4BbuoM');
     CustomerRepository\create($CustomerRepository, 'customer_2', 'Васечкин', 'GZx5ixNwYtos');
+
+    // Заказы
+    $OrderRepository = &OrderRepository\construct(MysqlFactory\create($MysqlFactory, 'order'));
+    OrderRepository\createDatabaseAndTable($OrderRepository);
 }
