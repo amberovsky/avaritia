@@ -86,22 +86,10 @@ function getVariables(array $View) {
  *
  * @param array $View объект отображения
  *
- * @return string отрендеренный json
+ * @return array данные ответа
  */
 function renderJson(array $View) {
-    $result = json_encode(
-        getVariables($View),
-        JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE);
-
-    if (($result === false) || (json_last_error() != JSON_ERROR_NONE)) {
-        trigger_error(
-            'Ошибка конвертации ответа в json. Код [' . json_last_error() . '], сообщение [' .
-                json_last_error_msg() . ']',
-            E_USER_ERROR
-        );
-    }
-
-    return $result;
+    return getVariables($View);
 }
 
 /**

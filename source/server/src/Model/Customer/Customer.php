@@ -127,7 +127,7 @@ function serializeToMemcache(array $Customer) {
  * @return &array объект заказчика
  */
 function &unserializeFromMysql(array $data) {
-    $Customer = construct();
+    $Customer = &construct();
 
     setId($Customer, $data['id']);
     setLogin($Customer, $data['login']);
