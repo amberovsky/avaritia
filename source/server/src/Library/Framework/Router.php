@@ -28,6 +28,7 @@ const
 const
     FIELD_CONTROLLER_NAME   = 'controller', /** имя контроллера */
     FIELD_ACTION_NAME       = 'action', /** имя экшена */
+    FIELD_ROUTE_NAME        = 'route', /** какой роут был сматчен */
     FIELD_REQUEST           = 'Request', /** объект запроса */
     FIELD_CONFIG            = 'config', /** конфигурация роутинга */
     FIELD_APPLICATION       = 'Application'; /** объект приложения */
@@ -81,6 +82,7 @@ function &construct(array &$Config, array &$Request, array &$Application) {
         FIELD_APPLICATION       => &$Application,
         FIELD_ACTION_NAME       => '',
         FIELD_CONTROLLER_NAME   => '',
+        FIELD_ROUTE_NAME        => '',
     ];
 
     return $Router;
@@ -133,6 +135,7 @@ function match(array &$Router) {
                 trigger_error('Отсутствует имя скрипта', E_USER_ERROR);
             }
 
+            $Router[FIELD_ROUTE_NAME] = 'script';
             setControllerName($Router, Request\getArgv($Request)[1]);
             setActionName($Router, 'run');
             break;
@@ -157,14 +160,15 @@ function match(array &$Router) {
                     setControllerName($Router, $data[CONFIGURATION_CONTROLLER]);
                     setActionName($Router, ($count == 1) ? $data[CONFIGURATION_DEFAULT_ACTION] : $matches[1]);
 
+                    $Router[FIELD_ROUTE_NAME] = $name;
                     $found = true;
                     break;
                 }
             }
 
             if (!$found) {
-                // TODO роутинг на страниу ошибок
-                trigger_error('TODO роутинг не найден [' . $documentUri . ']', E_USER_ERROR);
+                header('HTTP/1.0 404 Not Found');
+                exit();
             }
 
             break;
@@ -203,4 +207,13 @@ function setActionName(array &$Router, $name) {
  */
 function getActionName(array $Router) {
     return $Router[FIELD_ACTION_NAME];
+}
+
+/**
+ * @param array $Router объект роута
+ *
+ * @return string имя сматченного роута
+ */
+function getRouteName(array $Router) {
+    return $Router[FIELD_ROUTE_NAME];
 }

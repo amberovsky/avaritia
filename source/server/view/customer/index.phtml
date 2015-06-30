@@ -1,10 +1,19 @@
+<?
+    /** @var array &$ActiveUser текущий залогиненый заказчик */
+
+    load('Avaritia\Model\Customer\Customer');
+    load('Avaritia\Library\Session');
+
+    use Avaritia\Model\Customer\Customer;
+    use Avaritia\Library\Session;
+?>
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Avaritia</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/vendor/bootstrap-3.3.5.min.css">
 </head>
 <body>
 <div class="container">
@@ -19,12 +28,13 @@
             <div class="col-md-3">
                 <div class="panel panel-default">
                     <div class="panel-body text-center">
-                        email@email.com
-                        <a href=""><i class="glyphicon glyphicon-off"></i></a>
-                        <div>
-                            <i class="glyphicon glyphicon-ruble"></i>
-                            <b>100.50</b>
-                        </div>
+                        <?=Customer\getFio($ActiveUser); ?>
+                        <form method="POST" action="/index/logout">
+                            <div class="form-group">
+                                <button type="submit" name="logout" class="btn btn-danger">Выход</button>
+                                <input type="hidden" name="token" value="<?=Session\getToken(); ?>" />
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -32,7 +42,10 @@
     </div>
 </div>
 <!-- scripts -->
-<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<script src="js/vendor/jquery-2.1.4.min.js"></script>
+<script src="js/vendor/bootstrap-3.3.5.min.js"></script>
+<script src="js/avaritia/config_<?=REVISION; ?>.js"></script>
+<script src="js/avaritia/api_<?=REVISION; ?>.js"></script>
+<script src="js/avaritia/customer_<?=REVISION; ?>.js"></script>
 </body>
 </html>

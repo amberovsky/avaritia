@@ -61,9 +61,9 @@ function getConfig(array $ServiceManager) {
  *
  * @param array &$ServiceManager объект сервис-менеджера
  * @param string $name что сохраняем
- * @param mixed $value значение
+ * @param mixed &$value значение
  */
-function set(array &$ServiceManager, $name, $value) {
+function set(array &$ServiceManager, $name, &$value) {
     $ServiceManager[FIELD_DATA][$name] = &$value;
 }
 
@@ -71,14 +71,12 @@ function set(array &$ServiceManager, $name, $value) {
  * @param array $ServiceManager объект сервис-менеджера
  * @param string $name имя запрашиваемой сущности
  *
- * @return &array сущность
+ * @return &array|null сущность
  */
 function &get(array $ServiceManager, $name) {
-    if (isset($ServiceManager[FIELD_DATA][$name])) {
-        return $ServiceManager[FIELD_DATA][$name];
-    } else {
-        trigger_error('Значение [' . $name . '] не найдено в сервис-менеджере', E_USER_ERROR);
-    }
+    $result = isset($ServiceManager[FIELD_DATA][$name]) ? $ServiceManager[FIELD_DATA][$name] : null;
+
+    return $result;
 }
 
 /**

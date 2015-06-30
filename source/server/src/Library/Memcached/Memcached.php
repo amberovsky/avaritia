@@ -65,6 +65,15 @@ function &getMemcacheObject(array $Memcached) {
 }
 
 /**
+ * @param array $Memcached объект мемкеша
+ *
+ * @return array конфигурация пула
+ */
+function getPoolConfig(array $Memcached) {
+    return $Memcached[FIELD_POOL];
+}
+
+/**
  * @link http://php.net/manual/ru/memcache.set.php
  *
  * @param array $Memcached объект мемкеша

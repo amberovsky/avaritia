@@ -14,7 +14,7 @@ use Avaritia\Library\Mysql\MysqlFactory;
 // Поля класса
 const
     FIELD_MYSQL_LINK    = 'mysql_link', /** соедиение с mysql. Используется mysql_, потому что ООП нельзя  */
-    FIELD_CONFIG        = 'config';
+    FIELD_CONFIG        = 'config'; /** конфиг инстанса */
 
 /**
  * @param array $config конфиг инстанса

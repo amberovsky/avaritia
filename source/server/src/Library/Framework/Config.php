@@ -20,7 +20,7 @@ function &construct() {
     ];
 
     // Глобальные конфиги
-    foreach (glob(PROJECT_CONFIGURATION . '/*.php') as $file) {
+    foreach (glob(PROJECT_CONFIGURATION . '/common/*.php') as $file) {
         $Config[FIELD_DATA] += require_once($file);
     }
 

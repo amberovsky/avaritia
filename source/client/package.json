@@ -1,0 +1,21 @@
+{
+  "name": "avaritia",
+  "version": "0.0.1",
+  "description": "secret project",
+  "main": " ",
+  "dependencies": {
+    "grunt": "~0.4.2",
+    "grunt-cli": "~0.1.11",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-contrib-copy": "~0.5.0"
+  },
+  "devDependencies": {
+    "grunt-contrib-uglify": "^0.4.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/amberovsky/avaritia"
+  },
+  "author": "amberovsky",
+  "license": "MIT"
+}

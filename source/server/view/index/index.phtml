@@ -1,4 +1,64 @@
 <?
-    /** @var string $name кого приветствуем */
+    /** @var string $errorMsg сообщение об ошибке логина, если есть */
 ?>
-Привет, <?=$name; ?>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Avaritia</title>
+    <link rel="stylesheet" href="css/vendor/bootstrap-3.3.5.min.css">
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+        <h1 class="text-center">
+            <small><span class="glyphicon glyphicon-piggy-bank"></span></small>
+            Avaritia
+        </h1>
+    </div>
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <form method="POST" action="/">
+                        <div class="form-group text-center">
+                            <div class="btn-group" data-toggle="buttons">
+                                <label class="btn btn-primary active">
+                                    <input type="radio" name="loginAs" value="customer" checked />Вход для заказчиков
+                                </label>
+                                <label class="btn btn-primary">
+                                    <input type="radio" name="loginAs" value="executor" />Вход для исполнителей
+                                </label>
+                            </div>
+                        </div>
+                        <? if (!empty($errorMsg)): ?>
+                            <div class="alert alert-danger" role="alert">
+                                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                                <span class="sr-only">Ошибка:</span>
+                                <?=$errorMsg; ?>
+                            </div>
+                        <? endif; ?>
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="login" name="login" required="required" placeholder="Логин" maxlength="16">
+                        </div>
+                        <div class="form-group">
+                            <input type="password" class="form-control" id="password" name="password" required="required" placeholder="Пароль">
+                        </div>
+                        <div class="text-right">
+                            <button type="submit" id="btnLogin" class="btn btn-success">Вход</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- scripts -->
+<script src="js/vendor/jquery-2.1.4.min.js"></script>
+<script src="js/vendor/bootstrap-3.3.5.min.js"></script>
+<script src="js/avaritia/config_<?=REVISION; ?>.js"></script>
+<script src="js/avaritia/index_<?=REVISION; ?>.js"></script>
+</body>
+</html>

@@ -11,7 +11,8 @@
 - memcached
 - php5-mysqlnd
 - mysql-server >= 5.5
-- X64
+- x64
+- npm
 
 ## Настройка
 
@@ -39,6 +40,23 @@
       server_name avaritia;
       root /var/www/public;
       index /index.php;
+      
+      add_header X-Content-Type-Options nosniff;
+      add_header X-Frame-Options DENY;
+      add_header X-XSS-Protection "1; mode=block;";
+      add_header X-Content-Security-Policy "allow 'self';";
+      add_header X-WebKit-CSP "allow 'self';";
+      
+      valid_referers blocked avaritia;
+      if ($invalid_referer) {
+          set $possible_csrf 1;
+      }
+      if ($request_method = POST) {
+          set $possible_csrf "${possible_csrf}2";
+      }
+      if ($possible_csrf = 12) {
+          return 403;
+      }
 
       location ~* "^/js/.*\.js(\.map){0,1}$" { }
       location ~* ^/fonts/.*\.(ttf)$ { }
@@ -58,12 +76,21 @@
 
 ## Описание проекта
 
+### Разработка
+
+- Стягиваем проект с форка
+
+    ```Bash
+    git clone https://github.com/<login>/avaritia.git
+    ```
+
+- Устанавливаем зависимости npm, выполняем в `./source/client/` команду `npm i`
+- Для сборки `./bin/build_dev.sh`
+
 ### Конфигурация
 
-- Конфигурация определяется через параметр окружения `AVARITIA_ENVIRONMENT`
-        В каталоге `configuration/` ищется каталог с таким названием и подгружаются все php конфиги
-
-#### Логгер `logger.php`
+- Конфигурация определяется через параметр окружения `AVARITIA_ENVIRONMENT`.
+  В каталоге `configuration/` ищется каталог с таким названием и подгружаются все php конфиги
 
 #### Memcache `memcached.php`
 
@@ -102,6 +129,12 @@
     Имеющиеся скрипты:
     * `Init`: первичная инициализация проекта
     * `Warm`: прогрев кешей
+    
+- `bin/build_dev.sh` сборка проекта на машине разработчика
+
+- `bin/deploy.sh` выкладка на проде
+
+- `bin/rollback.sh` откат на предыдущую ревизию
 
 ## Кто здесь?
 
