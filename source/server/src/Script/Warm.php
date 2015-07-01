@@ -8,26 +8,24 @@
 namespace Avaritia\Script\Warm;
 
 load('Avaritia\Library\Framework\ServiceManager');
-load('Avaritia\Library\Memcached\MemcachedFactory');
-load('Avaritia\Library\Memcached\Memcached');
 load('Avaritia\Library\Mysql\MysqlFactory');
 load('Avaritia\Library\Mysql\Mysql');
 load('Avaritia\Model\Customer\Customer');
 load('Avaritia\Model\Customer\CustomerRepository');
 load('Avaritia\Model\Executor\Executor');
 load('Avaritia\Model\Executor\ExecutorRepository');
-
+load('Avaritia\Model\Order\Order');
+load('Avaritia\Model\Order\OrderRepository');
 
 use Avaritia\Library\Framework\ServiceManager;
-use Avaritia\Library\Memcached\MemcachedFactory;
-use Avaritia\Library\Memcached\Memcached;
 use Avaritia\Library\Mysql\MysqlFactory;
 use Avaritia\Library\Mysql\Mysql;
 use Avaritia\Model\Customer\Customer;
 use Avaritia\Model\Customer\CustomerRepository;
 use Avaritia\Model\Executor\Executor;
 use Avaritia\Model\Executor\ExecutorRepository;
-
+use Avaritia\Model\Order\Order;
+use Avaritia\Model\Order\OrderRepository;
 
 /**
  * Запуск скрипта
@@ -35,19 +33,20 @@ use Avaritia\Model\Executor\ExecutorRepository;
  * @param array &$ServiceManager объект сервис-менеджера
  */
 function run(array &$ServiceManager) {
-    $MemcachedFactory = ServiceManager\getFactory($ServiceManager, 'Memcached');
-    $Memcached = MemcachedFactory\create($MemcachedFactory, 'cache');
-
     $MysqlFactory = ServiceManager\getFactory($ServiceManager, 'Mysql');
     $shardsConfig = MysqlFactory\getShardsConfig($MysqlFactory);
 
     // Заказчики
-    $CustomerRepository = &CustomerRepository\construct($Memcached, $MysqlFactory);
+    $CustomerRepository = &ServiceManager\get($ServiceManager, 'CustomerRepository');
     $maxCustomerId = 1;
     foreach ($shardsConfig[CustomerRepository\SHARD_CONFIG] as $shardId => $_) {
         $Mysql = MysqlFactory\createShard($MysqlFactory, CustomerRepository\SHARD_CONFIG, $shardId);
 
-        $data = Mysql\query($Mysql, 'SELECT * FROM ' . CustomerRepository\TABLE_NAME);
+        $data = Mysql\query(
+            $Mysql,
+            'SELECT * FROM ' . CustomerRepository\DATABASE_NAME . '.' . CustomerRepository\TABLE_NAME
+        );
+
         while (($customerData = Mysql\fetchAssoc($Mysql, $data)) !== false) {
             $Customer = &Customer\unserializeFromMysql($customerData);
             CustomerRepository\saveToMemcached($CustomerRepository, $Customer);
@@ -62,12 +61,16 @@ function run(array &$ServiceManager) {
     CustomerRepository\syncLastCustomerId($CustomerRepository, $maxCustomerId);
 
     // Исполнители
-    $ExecutorRepository = &ExecutorRepository\construct($Memcached, $MysqlFactory);
+    $ExecutorRepository = &ServiceManager\get($ServiceManager, 'ExecutorRepository');
     $maxExecutorId = 1;
     foreach ($shardsConfig[ExecutorRepository\SHARD_CONFIG] as $shardId => $_) {
         $Mysql = MysqlFactory\createShard($MysqlFactory, ExecutorRepository\SHARD_CONFIG, $shardId);
 
-        $data = Mysql\query($Mysql, 'SELECT * FROM ' . ExecutorRepository\TABLE_NAME);
+        $data = Mysql\query(
+            $Mysql,
+            'SELECT * FROM ' . ExecutorRepository\TABLE_NAME . '.' . ExecutorRepository\TABLE_NAME
+        );
+
         while (($executorData = Mysql\fetchAssoc($Mysql, $data)) !== false) {
             $Executor = &Executor\unserializeFromMysql($executorData);
             ExecutorRepository\saveLoginToMemcached(
@@ -85,4 +88,10 @@ function run(array &$ServiceManager) {
         }
     }
     ExecutorRepository\syncLastExecutorId($ExecutorRepository, $maxExecutorId);
+
+    // Заказы
+    $OrderRepository = &ServiceManager\get($ServiceManager, 'OrderRepository');
+    foreach (OrderRepository\fetchAll($OrderRepository) as $Order) {
+        OrderRepository\savePriceToMemcached($OrderRepository, Order\getPrice($Order));
+    }
 }

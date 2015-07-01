@@ -15,8 +15,10 @@ load('Avaritia\Library\Framework\Router');
 load('Avaritia\Library\Framework\View');
 load('Avaritia\Library\Session');
 load('Avaritia\Library\Memcached\MemcachedFactory');
+load('Avaritia\Library\Mysql\MysqlFactory');
 load('Avaritia\Model\Customer\CustomerRepository');
 load('Avaritia\Model\Executor\ExecutorRepository');
+load('Avaritia\Model\Order\OrderRepository');
 
 use Avaritia\Library\Framework\ServiceManager;
 use Avaritia\Library\Framework\Config;
@@ -26,8 +28,10 @@ use Avaritia\Library\Framework\Router;
 use Avaritia\Library\Framework\View;
 use Avaritia\Library\Session;
 use Avaritia\Library\Memcached\MemcachedFactory;
+use Avaritia\Library\Mysql\MysqlFactory;
 use Avaritia\Model\Customer\CustomerRepository;
 use Avaritia\Model\Executor\ExecutorRepository;
+use Avaritia\Model\Order\OrderRepository;
 
 // Режим запуска
 const
@@ -59,6 +63,34 @@ function &construct() {
     // Объект ответа
     $Response = &Response\construct($ServiceManager);
     ServiceManager\set($ServiceManager, 'Response', $Response);
+
+    ServiceManager\setInvokable($ServiceManager, 'ExecutorRepository', function (array &$ServiceManager) {
+        $ExecutorRepository = &ExecutorRepository\construct(
+            MemcachedFactory\create(ServiceManager\getFactory($ServiceManager, 'Memcached'), 'cache'),
+            ServiceManager\getFactory($ServiceManager, 'Mysql')
+        );
+
+        return $ExecutorRepository;
+    });
+
+    ServiceManager\setInvokable($ServiceManager, 'CustomerRepository', function (array &$ServiceManager) {
+        $CustomerRepository = &CustomerRepository\construct(
+            MemcachedFactory\create(ServiceManager\getFactory($ServiceManager, 'Memcached'), 'cache'),
+            ServiceManager\getFactory($ServiceManager, 'Mysql')
+        );
+
+        return $CustomerRepository;
+    });
+
+    ServiceManager\setInvokable($ServiceManager, 'OrderRepository', function (array &$ServiceManager) {
+        $OrderRepository = &OrderRepository\construct(
+            MemcachedFactory\create(ServiceManager\getFactory($ServiceManager, 'Memcached'), 'cache'),
+            MysqlFactory\create(ServiceManager\getFactory($ServiceManager, 'Mysql'), 'order')
+        );
+
+        return $OrderRepository;
+    });
+
 
     return $Application;
 }
@@ -150,10 +182,7 @@ function run(array &$Application) {
                     return;
                 }
 
-                $ExecutorRepository = &ExecutorRepository\construct(
-                    MemcachedFactory\create(ServiceManager\getFactory($ServiceManager, 'Memcached'), 'cache'),
-                    ServiceManager\getFactory($ServiceManager, 'Mysql')
-                );
+                $ExecutorRepository = &ServiceManager\get($ServiceManager, 'ExecutorRepository');
 
                 $ActiveUser = &ExecutorRepository\fetch($ExecutorRepository, $userData[0]);
 

@@ -12,7 +12,6 @@ load('Avaritia\Library\Framework\ServiceManager');
 load('Avaritia\Library\Framework\Request');
 load('Avaritia\Model\Customer\CustomerRepository');
 load('Avaritia\Model\Executor\ExecutorRepository');
-load('Avaritia\Library\Memcached\MemcachedFactory');
 load('Avaritia\Library\Session');
 
 use Avaritia\Library\Framework\ServiceManager;
@@ -20,7 +19,6 @@ use Avaritia\Library\Framework\Request;
 use Avaritia\Library\Framework\View;
 use Avaritia\Model\Customer\CustomerRepository;
 use Avaritia\Model\Executor\ExecutorRepository;
-use Avaritia\Library\Memcached\MemcachedFactory;
 use Avaritia\Library\Session;
 
 // Поля класса
@@ -88,11 +86,7 @@ function &indexAction(array &$Controller) {
             $ServiceManager = &getServiceManager($Controller);
 
             if ($loginAs == 'customer') { // Заказчик
-                $CustomerRepository = &CustomerRepository\construct(
-                    MemcachedFactory\create(ServiceManager\getFactory($ServiceManager, 'Memcached'), 'cache'),
-                    ServiceManager\getFactory($ServiceManager, 'Mysql')
-                );
-
+                $CustomerRepository = &ServiceManager\get($ServiceManager, 'CustomerRepository');
                 if (!CustomerRepository\validateAuth($CustomerRepository, $login, $password)) {
                     $errorMsg = 'Неверный логин/пароль';
                 } else {
@@ -108,10 +102,7 @@ function &indexAction(array &$Controller) {
                     exit();
                 }
             } else { // Исполнитель
-                $ExecutorRepository = &ExecutorRepository\construct(
-                    MemcachedFactory\create(ServiceManager\getFactory($ServiceManager, 'Memcached'), 'cache'),
-                    ServiceManager\getFactory($ServiceManager, 'Mysql')
-                );
+                $ExecutorRepository = &ServiceManager\get($ServiceManager, 'ExecutorRepository');
 
                 if (!ExecutorRepository\validateAuth($ExecutorRepository, $login, $password)) {
                     $errorMsg = 'Неверный логин/пароль';

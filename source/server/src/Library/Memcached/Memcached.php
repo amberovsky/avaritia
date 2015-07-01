@@ -113,3 +113,15 @@ function get(array $Memcached, $keys, array $flags = null) {
 function increment(array $Memcached, $key, $value = 1) {
     return memcache_increment(getMemcacheObject($Memcached), $key, $value);
 }
+
+/**
+ * @see http://php.net/manual/ru/memcache.delete.php
+ *
+ * @param array $Memcached объект мемкеша
+ * @param string $key ключ на удаление
+ *
+ * @return bool результат операции
+ */
+function delete(array $Memcached, $key) {
+    return memcache_delete(getMemcacheObject($Memcached), $key);
+}
