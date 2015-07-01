@@ -1,5 +1,6 @@
 <?
     /** @var string $errorMsg сообщение об ошибке логина, если есть */
+    /** @var string $loginAs от кого была предыдущая попытка входа */
 ?>
 <!DOCTYPE html>
 <html>
@@ -24,11 +25,11 @@
                     <form method="POST" action="/">
                         <div class="form-group text-center">
                             <div class="btn-group" data-toggle="buttons">
-                                <label class="btn btn-primary active">
-                                    <input type="radio" name="loginAs" value="customer" checked />Вход для заказчиков
+                                <label class="btn btn-primary <? if ($loginAs == 'customer') { echo 'active'; } ?>">
+                                    <input type="radio" name="loginAs" value="customer" <? if ($loginAs == 'customer') { echo 'checked'; } ?> />Вход для заказчиков
                                 </label>
-                                <label class="btn btn-primary">
-                                    <input type="radio" name="loginAs" value="executor" />Вход для исполнителей
+                                <label class="btn btn-primary <? if ($loginAs == 'executor') { echo 'active'; } ?>">
+                                    <input type="radio" name="loginAs" value="executor" <? if ($loginAs == 'executor') { echo 'checked'; } ?> />Вход для исполнителей
                                 </label>
                             </div>
                         </div>

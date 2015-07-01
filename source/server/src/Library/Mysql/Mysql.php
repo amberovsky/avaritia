@@ -90,6 +90,17 @@ function query(array &$Mysql, $query) {
 }
 
 /**
+ * @static
+ *
+ * @param resource $resource результат запроса
+ *
+ * @return int количество рядов результата запроса
+ */
+function numRows($resource) {
+    return mysql_num_rows($resource);
+}
+
+/**
  * @link http://php.net/manual/ru/function.mysql-fetch-assoc.php
  *
  * @param array &$Mysql объект инстанса mysql

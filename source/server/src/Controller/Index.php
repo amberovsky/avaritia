@@ -11,6 +11,7 @@ load('Avaritia\Library\Framework\View');
 load('Avaritia\Library\Framework\ServiceManager');
 load('Avaritia\Library\Framework\Request');
 load('Avaritia\Model\Customer\CustomerRepository');
+load('Avaritia\Model\Executor\ExecutorRepository');
 load('Avaritia\Library\Memcached\MemcachedFactory');
 load('Avaritia\Library\Session');
 
@@ -18,6 +19,7 @@ use Avaritia\Library\Framework\ServiceManager;
 use Avaritia\Library\Framework\Request;
 use Avaritia\Library\Framework\View;
 use Avaritia\Model\Customer\CustomerRepository;
+use Avaritia\Model\Executor\ExecutorRepository;
 use Avaritia\Library\Memcached\MemcachedFactory;
 use Avaritia\Library\Session;
 
@@ -83,9 +85,10 @@ function &indexAction(array &$Controller) {
         if ((($loginAs !== 'customer') && ($loginAs !== 'executor')) || is_null($login) || is_null($password)) {
             $errorMsg = 'Неверные данные';
         } else {
-            if ($loginAs == 'customer') {
-                $ServiceManager = &getServiceManager($Controller);
-                $CustomerRepository = CustomerRepository\construct(
+            $ServiceManager = &getServiceManager($Controller);
+
+            if ($loginAs == 'customer') { // Заказчик
+                $CustomerRepository = &CustomerRepository\construct(
                     MemcachedFactory\create(ServiceManager\getFactory($ServiceManager, 'Memcached'), 'cache'),
                     ServiceManager\getFactory($ServiceManager, 'Mysql')
                 );
@@ -104,10 +107,30 @@ function &indexAction(array &$Controller) {
                     header('Location: /customer', true, 307);
                     exit();
                 }
-            } else {
+            } else { // Исполнитель
+                $ExecutorRepository = &ExecutorRepository\construct(
+                    MemcachedFactory\create(ServiceManager\getFactory($ServiceManager, 'Memcached'), 'cache'),
+                    ServiceManager\getFactory($ServiceManager, 'Mysql')
+                );
 
+                if (!ExecutorRepository\validateAuth($ExecutorRepository, $login, $password)) {
+                    $errorMsg = 'Неверный логин/пароль';
+                } else {
+                    ServiceManager\set(
+                        $ServiceManager,
+                        'ActiveUser',
+                        ExecutorRepository\fetch($ExecutorRepository, $login)
+                    );
+
+                    Session\setActiveUserData($login, 'executor');
+
+                    header('Location: /executor', true, 307);
+                    exit();
+                }
             }
         }
+    } else {
+        $loginAs = 'customer';
     }
 
     $View = &View\construct();
@@ -116,6 +139,7 @@ function &indexAction(array &$Controller) {
         $View,
         [
             'errorMsg'  => $errorMsg,
+            'loginAs'   => $loginAs,
         ]
     );
 

@@ -21,8 +21,8 @@ use Avaritia\Model\Order\OrderRepository;
 
 // Поля класса
 const
-FIELD_SERVICE_MANAGER   = 'Service_Manager', /** объект сервис-менеджер */
-FIELD_REQUEST           = 'Request'; /** объект запроса */
+    FIELD_SERVICE_MANAGER   = 'Service_Manager', /** объект сервис-менеджер */
+    FIELD_REQUEST           = 'Request'; /** объект запроса */
 
 /**
  * @param array &$ServiceManager объект сервис-менеджер
