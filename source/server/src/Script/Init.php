@@ -11,12 +11,14 @@ load('Avaritia\Library\Framework\ServiceManager');
 load('Avaritia\Library\Memcached\MemcachedFactory');
 load('Avaritia\Library\Mysql\MysqlFactory');
 load('Avaritia\Model\Customer\CustomerRepository');
+load('Avaritia\Model\Executor\ExecutorRepository');
 load('Avaritia\Model\Order\OrderRepository');
 
 use Avaritia\Library\Framework\ServiceManager;
 use Avaritia\Library\Memcached\MemcachedFactory;
 use Avaritia\Library\Mysql\MysqlFactory;
 use Avaritia\Model\Customer\CustomerRepository;
+use Avaritia\Model\Executor\ExecutorRepository;
 use Avaritia\Model\Order\OrderRepository;
 
 /**
@@ -46,4 +48,16 @@ function run(array &$ServiceManager) {
     // Заказы
     $OrderRepository = &OrderRepository\construct(MysqlFactory\create($MysqlFactory, 'order'));
     OrderRepository\createDatabaseAndTable($OrderRepository);
+
+    // Исполнители
+    $ExecutorRepository = &ExecutorRepository\construct($Memcached, $MysqlFactory);
+    foreach ($shardsConfig[ExecutorRepository\SHARD_CONFIG] as $shardId => $_) {
+        ExecutorRepository\createShard($ExecutorRepository, $shardId);
+    }
+
+    ExecutorRepository\syncLastExecutorId($ExecutorRepository, 0);
+
+    // Два тестовых исполнителя
+    ExecutorRepository\create($ExecutorRepository, 'executor_1', 'Иванов', 100, '3urvrPhNvEpZ');
+    ExecutorRepository\create($ExecutorRepository, 'executor_2', 'Церетели', 200, 'ki22YIk1FR29');
 }

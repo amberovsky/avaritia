@@ -16,6 +16,7 @@ load('Avaritia\Library\Framework\View');
 load('Avaritia\Library\Session');
 load('Avaritia\Library\Memcached\MemcachedFactory');
 load('Avaritia\Model\Customer\CustomerRepository');
+load('Avaritia\Model\Executor\ExecutorRepository');
 
 use Avaritia\Library\Framework\ServiceManager;
 use Avaritia\Library\Framework\Config;
@@ -26,6 +27,7 @@ use Avaritia\Library\Framework\View;
 use Avaritia\Library\Session;
 use Avaritia\Library\Memcached\MemcachedFactory;
 use Avaritia\Model\Customer\CustomerRepository;
+use Avaritia\Model\Executor\ExecutorRepository;
 
 // Режим запуска
 const
@@ -143,6 +145,18 @@ function run(array &$Application) {
                 $ActiveUser = &CustomerRepository\fetch($CustomerRepository, $userData[0]);
             } else {
                 // Исполнитель
+                if (($routeName !== 'executor') && (($routeName !== 'index') || ($actionName !== 'logout'))) {
+                    header('Location: /executor', true, 307);
+                    return;
+                }
+
+                $ExecutorRepository = &ExecutorRepository\construct(
+                    MemcachedFactory\create(ServiceManager\getFactory($ServiceManager, 'Memcached'), 'cache'),
+                    ServiceManager\getFactory($ServiceManager, 'Mysql')
+                );
+
+                $ActiveUser = &ExecutorRepository\fetch($ExecutorRepository, $userData[0]);
+
             }
         } else {
             if ($routeName !== 'index') {

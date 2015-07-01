@@ -48,7 +48,7 @@ function &construct(array &$Memcached, array &$MysqlFactory) {
 /**
  * @private
  *
- * @param array $CustomerRepository
+ * @param array $CustomerRepository объект репозитория заказчика
  *
  * @return &array объект мемкеша
  */
@@ -88,7 +88,7 @@ function createMemcachedKeyForPasswordHash($login) {
 }
 
 /**
- * @param array &$CustomerRepository объект репозитория заказчика
+ * @param array $CustomerRepository объект репозитория заказчика
  * @param string $login логин заказчика
  *
  * @return &array|null объект заказчика или null, если таковой не найден
@@ -226,10 +226,10 @@ function createShard(array $CustomerRepository, $shardId) {
  * @param string $fio ФИО
  * @param string $password пароль заказчика
  *
- * @return &array объект пользователя
+ * @return &array объект заказчика
  */
 function &create(array $CustomerRepository, $login, $fio, $password) {
-    $Customer = Customer\construct();
+    $Customer = &Customer\construct();
 
     Customer\setId($Customer, Memcached\increment(getMemcached($CustomerRepository), getLastCustomerIdKey()));
     Customer\setLogin($Customer, $login);

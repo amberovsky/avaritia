@@ -1,1 +1,112 @@
-Страница исполнителей
+<?
+    /** @var array &$ActiveUser текущий залогиненый исполнитель */
+
+    load('Avaritia\Model\Executor\Executor');
+    load('Avaritia\Library\Session');
+
+    use Avaritia\Model\Executor\Executor;
+    use Avaritia\Library\Session;
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Avaritia</title>
+    <link rel="stylesheet" href="css/vendor/bootstrap-3.3.5.min.css">
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3">
+                <h1 class="text-center">
+                    Avaritia
+                </h1>
+            </div>
+            <div class="col-md-3">
+                <div class="panel panel-default">
+                    <div class="panel-body text-center">
+                        <?=Executor\getFio($ActiveUser); ?>
+                        <form method="POST" action="/index/logout">
+                            <div class="form-group">
+                                <button type="submit" name="logout" class="btn btn-danger">Выход</button>
+                                <input type="hidden" name="token" value="<?=Session\getToken(); ?>" />
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="row">
+
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Список заказов</h2>
+            <div class="alert alert-success">Заказ успешно выполнен, на счет зачислено 100.50 руб.</div>
+            <table class="table table-striped">
+                <tr>
+                    <th></th>
+                    <th class="text-center">Стоимость, руб.</th>
+                    <th>Текст заказа</th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <td>#1</td>
+                    <td class="text-center">100.50</td>
+                    <td>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+                        labore et dolore magna aliqua
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-primary">Выполнить</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>#2</td>
+                    <td class="text-center">100.50</td>
+                    <td>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+                        labore et dolore magna aliqua
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-primary">Выполнить</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>#3</td>
+                    <td class="text-center">100.50</td>
+                    <td>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+                        labore et dolore magna aliqua
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-primary">Выполнить</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>#4</td>
+                    <td class="text-center">100.50</td>
+                    <td>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+                        labore et dolore magna aliqua
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-primary">Выполнить</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+<!-- scripts -->
+<script src="js/vendor/jquery-2.1.4.min.js"></script>
+<script src="js/vendor/bootstrap-3.3.5.min.js"></script>
+<script src="js/avaritia/config_<?=REVISION; ?>.js"></script>
+<script src="js/avaritia/api_<?=REVISION; ?>.js"></script>
+<script src="js/avaritia/executor_<?=REVISION; ?>.js"></script>
+</body>
+</html>

@@ -14,6 +14,9 @@ load('Avaritia\Library\Mysql\MysqlFactory');
 load('Avaritia\Library\Mysql\Mysql');
 load('Avaritia\Model\Customer\Customer');
 load('Avaritia\Model\Customer\CustomerRepository');
+load('Avaritia\Model\Executor\Executor');
+load('Avaritia\Model\Executor\ExecutorRepository');
+
 
 use Avaritia\Library\Framework\ServiceManager;
 use Avaritia\Library\Memcached\MemcachedFactory;
@@ -22,6 +25,9 @@ use Avaritia\Library\Mysql\MysqlFactory;
 use Avaritia\Library\Mysql\Mysql;
 use Avaritia\Model\Customer\Customer;
 use Avaritia\Model\Customer\CustomerRepository;
+use Avaritia\Model\Executor\Executor;
+use Avaritia\Model\Executor\ExecutorRepository;
+
 
 /**
  * Запуск скрипта
@@ -43,7 +49,7 @@ function run(array &$ServiceManager) {
 
         $data = Mysql\query($Mysql, 'SELECT * FROM ' . CustomerRepository\TABLE_NAME);
         while (($customerData = Mysql\fetchAssoc($Mysql, $data)) !== false) {
-            $Customer = Customer\unserializeFromMysql($customerData);
+            $Customer = &Customer\unserializeFromMysql($customerData);
             CustomerRepository\saveToMemcached($CustomerRepository, $Customer);
             CustomerRepository\savePasswordHashToMemcached(
                 $CustomerRepository,
@@ -54,4 +60,29 @@ function run(array &$ServiceManager) {
         }
     }
     CustomerRepository\syncLastCustomerId($CustomerRepository, $maxCustomerId);
+
+    // Исполнители
+    $ExecutorRepository = &ExecutorRepository\construct($Memcached, $MysqlFactory);
+    $maxExecutorId = 1;
+    foreach ($shardsConfig[ExecutorRepository\SHARD_CONFIG] as $shardId => $_) {
+        $Mysql = MysqlFactory\createShard($MysqlFactory, ExecutorRepository\SHARD_CONFIG, $shardId);
+
+        $data = Mysql\query($Mysql, 'SELECT * FROM ' . ExecutorRepository\TABLE_NAME);
+        while (($executorData = Mysql\fetchAssoc($Mysql, $data)) !== false) {
+            $Executor = &Executor\unserializeFromMysql($executorData);
+            ExecutorRepository\saveLoginToMemcached(
+                $ExecutorRepository,
+                Executor\getLogin($Executor),
+                Executor\getId($Executor)
+            );
+
+            ExecutorRepository\savePasswordHashToMemcached(
+                $ExecutorRepository,
+                $Executor,
+                $executorData['password_hash']
+            );
+            $maxExecutorId = max($maxExecutorId, Executor\getId($Executor));
+        }
+    }
+    ExecutorRepository\syncLastExecutorId($ExecutorRepository, $maxExecutorId);
 }
