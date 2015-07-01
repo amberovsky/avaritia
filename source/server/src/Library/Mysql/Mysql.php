@@ -62,7 +62,6 @@ function getMysqlLink(array &$Mysql) {
         }
 
         mysql_query('SET NAMES utf8', $Mysql[FIELD_MYSQL_LINK]);
-        mysql_select_db($config[MysqlFactory\CONFIGURATION_DATABASE], $Mysql[FIELD_MYSQL_LINK]);
     }
 
     return $Mysql[FIELD_MYSQL_LINK];
@@ -110,4 +109,22 @@ function numRows($resource) {
  */
 function fetchAssoc(array &$Mysql, $result) {
     return mysql_fetch_assoc($result);
+}
+
+/**
+ * @param array &$Mysql объект инстанса mysql
+ *
+ * @return int id последней сгенерирвоанной записи по колонке AUTO_INCREMENT
+ */
+function lastInsertId(array &$Mysql) {
+    return mysql_insert_id(getMysqlLink($Mysql));
+}
+
+/**
+ * @param array &$Mysql объект инстанса mysql
+ *
+ * @return int число затронутых строк
+ */
+function affectedRows(array &$Mysql) {
+    return mysql_affected_rows(getMysqlLink($Mysql));
 }

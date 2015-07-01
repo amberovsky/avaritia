@@ -10,13 +10,11 @@ namespace Avaritia\Controller\Customer;
 load('Avaritia\Library\Framework\View');
 load('Avaritia\Library\Framework\ServiceManager');
 load('Avaritia\Library\Framework\Request');
-load('Avaritia\Library\Mysql\MysqlFactory');
 load('Avaritia\Model\Order\OrderRepository');
 
 use Avaritia\Library\Framework\View;
 use Avaritia\Library\Framework\ServiceManager;
 use Avaritia\Library\Framework\Request;
-use Avaritia\Library\Mysql\MysqlFactory;
 use Avaritia\Model\Order\OrderRepository;
 
 // Поля класса
@@ -101,9 +99,7 @@ function cmdAdd(array &$Controller) {
         ];
     }
 
-    $OrderRepository = &OrderRepository\construct(
-        MysqlFactory\create(ServiceManager\getFactory(getServiceManager($Controller), 'Mysql'), 'order')
-    );
+    $OrderRepository = &ServiceManager\get(getServiceManager($Controller), 'OrderRepository');
 
     if (OrderRepository\create($OrderRepository, $price, $text) === false) {
         return [

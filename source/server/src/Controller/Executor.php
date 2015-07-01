@@ -10,14 +10,16 @@ namespace Avaritia\Controller\Executor;
 load('Avaritia\Library\Framework\View');
 load('Avaritia\Library\Framework\ServiceManager');
 load('Avaritia\Library\Framework\Request');
-load('Avaritia\Library\Mysql\MysqlFactory');
 load('Avaritia\Model\Order\OrderRepository');
+load('Avaritia\Model\Executor\Executor');
+load('Avaritia\Model\Executor\ExecutorRepository');
 
 use Avaritia\Library\Framework\View;
 use Avaritia\Library\Framework\ServiceManager;
 use Avaritia\Library\Framework\Request;
-use Avaritia\Library\Mysql\MysqlFactory;
 use Avaritia\Model\Order\OrderRepository;
+use Avaritia\Model\Executor\Executor;
+use Avaritia\Model\Executor\ExecutorRepository;
 
 // Поля класса
 const
@@ -69,15 +71,54 @@ function &getRequest(array $Script) {
  * @return &array объект отображения
  */
 function &indexAction(array &$Controller) {
+    $OrderRepository = &ServiceManager\get(getServiceManager($Controller), 'OrderRepository');
+
     $View = &View\construct();
 
     View\setTemplateName($View, 'executor\index');
     View\setVariables(
         $View,
         [
-            'ActiveUser'    => ServiceManager\get(getServiceManager($Controller), 'ActiveUser')
+            'ActiveUser'    => ServiceManager\get(getServiceManager($Controller), 'ActiveUser'),
+            'Orders'        => OrderRepository\fetchAll($OrderRepository),
         ]
     );
 
     return $View;
+}
+
+/**
+ * Выполнение заказа
+ *
+ * @param array &$Controller объект контроллера
+ *
+ * @return array
+ */
+function cmdExecute(array &$Controller) {
+    $Request = &getRequest($Controller);
+    $ServiceManager = &getServiceManager($Controller);
+
+    $orderId = (int) Request\getPostParam($Request, 'orderId');
+
+    if ($orderId < 1) {
+        return [
+            'errorMsg'  => 'Неверный id заказа',
+        ];
+    }
+
+    $OrderRepository = ServiceManager\get($ServiceManager, 'OrderRepository');
+    if (!OrderRepository\deleteFromMysql($OrderRepository, $orderId)) {
+        return [
+            'errorMsg'  => 'Такого заказа (уже) нет',
+        ];
+    }
+
+    $price = OrderRepository\getPriceFromMemcachedAndDeleteIt($OrderRepository, $orderId);
+    $ExecutorRepository = ServiceManager\get($ServiceManager, 'ExecutorRepository');
+    $ActiveUser = ServiceManager\get($ServiceManager, 'ActiveUser');
+    ExecutorRepository\updateSalary($ExecutorRepository, $ActiveUser, $price);
+
+    return [
+        'salary'    => Executor\getSalary($ActiveUser),
+    ];
 }

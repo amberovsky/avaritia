@@ -159,8 +159,8 @@ function createInMysql(array $CustomerRepository, array $Customer, $passwordHash
     $Mysql = &MysqlFactory\createShard(getMysqlFactory($CustomerRepository), SHARD_CONFIG, getShardId($Customer));
 
     return Mysql\query($Mysql, '
-        INSERT INTO
-          Customer (id, login, fio, password_hash)
+        INSERT INTO ' . DATABASE_NAME . '.' . TABLE_NAME . '
+          (id, login, fio, password_hash)
         VALUES (
           \'' . mysql_real_escape_string(Customer\getId($Customer)) . '\',
           \'' . mysql_real_escape_string(Customer\getLogin($Customer)) . '\',

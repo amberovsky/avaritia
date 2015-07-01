@@ -60,7 +60,7 @@
 
       location ~* "^/js/.*\.js(\.map){0,1}$" { }
       location ~* ^/fonts/.*\.(ttf)$ { }
-      location ~* ^/css/.*\.(css|woff|svg|eot)$ { }
+      location ~* ^/css/.*\.(css|woff|woff2|svg|eot)$ { }
       location ~* ^/images/.*\.(ico|png|bmp|jpg|gif)$ { }
       location ~* ^(/favicon.ico)|(robots.txt)$ {}
 
@@ -117,6 +117,8 @@
 #### ServiceManager `sm.php`
 
 - В секции `ServiceManager\CONFIGURATION_FACTORIES` задаётся список фабрик. При инстанциировании в конструктор фабрик передаётся объект ServiceManager
+
+- В ServiceManager можно использовать callable для создания объектов 
 
 ### Шелл-скрипты
 

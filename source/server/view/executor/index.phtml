@@ -1,11 +1,14 @@
 <?
-    /** @var array &$ActiveUser текущий залогиненый исполнитель */
+    /** @var array $ActiveUser текущий залогиненый исполнитель */
+    /** @var array $Orders список заказов */
 
     load('Avaritia\Model\Executor\Executor');
     load('Avaritia\Library\Session');
+    load('Avaritia\Model\Order\Order');
 
     use Avaritia\Model\Executor\Executor;
     use Avaritia\Library\Session;
+    use Avaritia\Model\Order\Order;
 ?>
 <!DOCTYPE html>
 <html>
@@ -21,7 +24,8 @@
         <div class="row">
             <div class="col-md-6 col-md-offset-3">
                 <h1 class="text-center">
-                    Avaritia
+                    <small><span class="glyphicon glyphicon-piggy-bank"></span></small>
+                    Avaritia: исполнитель
                 </h1>
             </div>
             <div class="col-md-3">
@@ -54,50 +58,18 @@
                     <th>Текст заказа</th>
                     <th></th>
                 </tr>
-                <tr>
-                    <td>#1</td>
-                    <td class="text-center">100.50</td>
-                    <td>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                        labore et dolore magna aliqua
-                    </td>
-                    <td>
-                        <button class="btn btn-sm btn-primary">Выполнить</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>#2</td>
-                    <td class="text-center">100.50</td>
-                    <td>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                        labore et dolore magna aliqua
-                    </td>
-                    <td>
-                        <button class="btn btn-sm btn-primary">Выполнить</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>#3</td>
-                    <td class="text-center">100.50</td>
-                    <td>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                        labore et dolore magna aliqua
-                    </td>
-                    <td>
-                        <button class="btn btn-sm btn-primary">Выполнить</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>#4</td>
-                    <td class="text-center">100.50</td>
-                    <td>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                        labore et dolore magna aliqua
-                    </td>
-                    <td>
-                        <button class="btn btn-sm btn-primary">Выполнить</button>
-                    </td>
-                </tr>
+                <? foreach ($Orders as $Order): ?>
+                    <tr>
+                        <td>#<?=Order\getId($Order); ?></td>
+                        <td class="text-center"><?=Order\getPrice($Order); ?></td>
+                        <td>
+                            <textarea><?=htmlspecialchars(Order\getText($Order), ENT_COMPAT | ENT_QUOTES); ?></textarea>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-primary">Выполнить</button>
+                        </td>
+                    </tr>
+                <? endforeach; ?>
             </table>
         </div>
     </div>

@@ -8,14 +8,12 @@
 namespace Avaritia\Script\Init;
 
 load('Avaritia\Library\Framework\ServiceManager');
-load('Avaritia\Library\Memcached\MemcachedFactory');
 load('Avaritia\Library\Mysql\MysqlFactory');
 load('Avaritia\Model\Customer\CustomerRepository');
 load('Avaritia\Model\Executor\ExecutorRepository');
 load('Avaritia\Model\Order\OrderRepository');
 
 use Avaritia\Library\Framework\ServiceManager;
-use Avaritia\Library\Memcached\MemcachedFactory;
 use Avaritia\Library\Mysql\MysqlFactory;
 use Avaritia\Model\Customer\CustomerRepository;
 use Avaritia\Model\Executor\ExecutorRepository;
@@ -27,14 +25,10 @@ use Avaritia\Model\Order\OrderRepository;
  * @param array &$ServiceManager объект сервис-менеджера
  */
 function run(array &$ServiceManager) {
-    $MemcachedFactory = ServiceManager\getFactory($ServiceManager, 'Memcached');
-    $Memcached = MemcachedFactory\create($MemcachedFactory, 'cache');
-
-    $MysqlFactory = ServiceManager\getFactory($ServiceManager, 'Mysql');
-    $shardsConfig = MysqlFactory\getShardsConfig($MysqlFactory);
+    $shardsConfig = MysqlFactory\getShardsConfig(ServiceManager\getFactory($ServiceManager, 'Mysql'));
 
     // Заказчики
-    $CustomerRepository = &CustomerRepository\construct($Memcached, $MysqlFactory);
+    $CustomerRepository = &ServiceManager\get($ServiceManager, 'CustomerRepository');
     foreach ($shardsConfig[CustomerRepository\SHARD_CONFIG] as $shardId => $_) {
         CustomerRepository\createShard($CustomerRepository, $shardId);
     }
@@ -45,12 +39,19 @@ function run(array &$ServiceManager) {
     CustomerRepository\create($CustomerRepository, 'customer_1', 'Петров', '8anbAw4BbuoM');
     CustomerRepository\create($CustomerRepository, 'customer_2', 'Васечкин', 'GZx5ixNwYtos');
 
+
     // Заказы
-    $OrderRepository = &OrderRepository\construct(MysqlFactory\create($MysqlFactory, 'order'));
+    $OrderRepository = &ServiceManager\get($ServiceManager, 'OrderRepository');
+
     OrderRepository\createDatabaseAndTable($OrderRepository);
 
+    // Два тестовых заказа
+    OrderRepository\create($OrderRepository, 'text', 100);
+    OrderRepository\create($OrderRepository, 'text2', 200);
+
+
     // Исполнители
-    $ExecutorRepository = &ExecutorRepository\construct($Memcached, $MysqlFactory);
+    $ExecutorRepository = &ServiceManager\get($ServiceManager, 'ExecutorRepository');
     foreach ($shardsConfig[ExecutorRepository\SHARD_CONFIG] as $shardId => $_) {
         ExecutorRepository\createShard($ExecutorRepository, $shardId);
     }

@@ -146,7 +146,9 @@ function createShard(array $ExecutorRepository, $shardId) {
           login         VARCHAR(16)   NOT NULL,
           salary        INT UNSIGNED  NOT NULL,
           fio           VARCHAR(32)   NOT NULL,
-          password_hash VARCHAR(60)   NOT NULL
+          password_hash VARCHAR(60)   NOT NULL,
+
+          INDEX(id)
         ) ENGINE=InnoDB;
     ');
 }
@@ -198,8 +200,8 @@ function createInMysql(array $ExecutorRepository, array $Executor, $passwordHash
     );
 
     return Mysql\query($Mysql, '
-        INSERT INTO
-          Executor (id, login, salary, fio, password_hash)
+        INSERT INTO ' . DATABASE_NAME . '.' . TABLE_NAME . '
+          (id, login, salary, fio, password_hash)
         VALUES (
           \'' . mysql_real_escape_string(Executor\getId($Executor)) . '\',
           \'' . mysql_real_escape_string(Executor\getLogin($Executor)) . '\',
@@ -269,11 +271,37 @@ function &fetch(array $ExecutorRepository, $login) {
 
     $id = (int) $id;
     $Mysql = &MysqlFactory\createShard(getMysqlFactory($ExecutorRepository), SHARD_CONFIG, getShardId($id));
-    $result = Mysql\query($Mysql, 'SELECT id, fio, login, salary FROM ' . TABLE_NAME . ' WHERE id = ' . $id);
+    $result = Mysql\query(
+        $Mysql,
+        'SELECT id, fio, login, salary FROM ' . DATABASE_NAME . '.' . TABLE_NAME . ' WHERE id = ' . (int) $id
+    );
 
     if (Mysql\numRows($result) == 0) {
         return null;
     }
 
     return Executor\unserializeFromMysql(Mysql\fetchAssoc($Mysql, $result));
+}
+
+/**
+ * Обновление зарплаты исполнителя
+ *
+ * @param array &$ExecutorRepository объект репозитория исполнителя
+ * @param array &$Executor объект исполнителя
+ * @param int $money на сколько изменить зарплату
+ */
+function updateSalary(array &$ExecutorRepository, array &$Executor, $money) {
+    $Mysql = &MysqlFactory\createShard(
+        getMysqlFactory($ExecutorRepository),
+        SHARD_CONFIG,
+        getShardId(Executor\getId($Executor))
+    );
+
+    Mysql\query($Mysql, '
+        UPDATE ' . DATABASE_NAME . '.' . TABLE_NAME . '
+        SET SALARY = SALARY + ' . (int) $money . '
+        WHERE id = ' . (int) Executor\getId($Executor)
+    );
+
+    Executor\setSalary($Executor, Executor\getSalary($Executor) + (int) $money);
 }
