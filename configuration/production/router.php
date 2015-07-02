@@ -13,12 +13,18 @@ use Avaritia\Library\Framework\Router;
 return [
     Router\CONFIGURATION_SECTION    => [
         Router\CONFIGURATION_CLI    => [
-
+            'script'    => 'Script',
         ],
 
         Router\CONFIGURATION_WEB    => [
-            'index' => [ // Стартовая страница
+            'root'      => [ // Стартовая страница
                 Router\CONFIGURATION_PATTERN        => '/',
+                Router\CONFIGURATION_CONTROLLER     => 'Index',
+                Router\CONFIGURATION_DEFAULT_ACTION => 'index',
+            ],
+
+            'index'      => [ // Стартовая страница
+                Router\CONFIGURATION_PATTERN        => '/index',
                 Router\CONFIGURATION_CONTROLLER     => 'Index',
                 Router\CONFIGURATION_DEFAULT_ACTION => 'index',
             ],
