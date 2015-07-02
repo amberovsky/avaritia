@@ -48,20 +48,20 @@ function &construct(array &$Memcached, array &$MysqlFactory) {
 /**
  * @private
  *
- * @param array $CustomerRepository объект репозитория заказчика
+ * @param array &$CustomerRepository объект репозитория заказчика
  *
  * @return &array объект мемкеша
  */
-function &getMemcached(array $CustomerRepository) {
+function &getMemcached(array &$CustomerRepository) {
     return $CustomerRepository[FIELD_MEMCACHED];
 }
 
 /**
- * @param array $CustomerRepository объект репозитория заказчика
+ * @param array &$CustomerRepository объект репозитория заказчика
  *
  * @return &array объект фабрики mysql
  */
-function &getMysqlFactory(array $CustomerRepository) {
+function &getMysqlFactory(array &$CustomerRepository) {
     return $CustomerRepository[FIELD_MYSQL_FACTORY];
 }
 
@@ -88,12 +88,12 @@ function createMemcachedKeyForPasswordHash($login) {
 }
 
 /**
- * @param array $CustomerRepository объект репозитория заказчика
+ * @param array &$CustomerRepository объект репозитория заказчика
  * @param string $login логин заказчика
  *
  * @return &array|null объект заказчика или null, если таковой не найден
  */
-function &fetch(array $CustomerRepository, $login) {
+function &fetch(array &$CustomerRepository, $login) {
     $Memcached = &getMemcached($CustomerRepository);
 
     $data = Memcached\get($Memcached, createMemcachedKeyForData($login));
@@ -103,23 +103,23 @@ function &fetch(array $CustomerRepository, $login) {
 }
 
 /**
- * @param array $Customer объект заказчика
+ * @param array &$Customer объект заказчика
  *
  * @return int id mysql шарда для данного заказчика
  */
-function getShardId(array $Customer) {
+function getShardId(array &$Customer) {
     return (int) floor(Customer\getId($Customer) / 10000);
 }
 
 /**
  * Сохраняет данные заказчика в мемкеше
  *
- * @param array $CustomerRepository объект репозитория заказчика
- * @param array $Customer объект заказчика
+ * @param array &$CustomerRepository объект репозитория заказчика
+ * @param array &$Customer объект заказчика
  *
  * @return bool результат сохранения
  */
-function saveToMemcached(array $CustomerRepository, array $Customer) {
+function saveToMemcached(array &$CustomerRepository, array &$Customer) {
     return Memcached\set(
         getMemcached($CustomerRepository),
         createMemcachedKeyForData(Customer\getLogin($Customer)),
@@ -130,13 +130,13 @@ function saveToMemcached(array $CustomerRepository, array $Customer) {
 /**
  * Сохраняет хешированный пароль заказчика в мемкеше
  *
- * @param array $CustomerRepository объект репозитория заказчика
- * @param array $Customer объект заказчика
+ * @param array &$CustomerRepository объект репозитория заказчика
+ * @param array &$Customer объект заказчика
  * @param string $passwordHash хешированный пароль
  *
  * @return bool результат сохранения
  */
-function savePasswordHashToMemcached(array $CustomerRepository, array $Customer, $passwordHash) {
+function savePasswordHashToMemcached(array &$CustomerRepository, array &$Customer, $passwordHash) {
     return Memcached\set(
         getMemcached($CustomerRepository),
         createMemcachedKeyForPasswordHash(Customer\getLogin($Customer)),
@@ -149,13 +149,13 @@ function savePasswordHashToMemcached(array $CustomerRepository, array $Customer,
  *
  * Создаёт нового заказчика в mysql
  *
- * @param array $CustomerRepository объект репозитория заказчика
- * @param array $Customer объект заказчика
+ * @param array &$CustomerRepository объект репозитория заказчика
+ * @param array &$Customer объект заказчика
  * @param string $passwordHash хешированный пароль заказчика
  *
  * @return bool успех создания
  */
-function createInMysql(array $CustomerRepository, array $Customer, $passwordHash) {
+function createInMysql(array &$CustomerRepository, array &$Customer, $passwordHash) {
     $Mysql = &MysqlFactory\createShard(getMysqlFactory($CustomerRepository), SHARD_CONFIG, getShardId($Customer));
 
     return Mysql\query($Mysql, '
@@ -182,12 +182,12 @@ function getLastCustomerIdKey() {
 /**
  * Обновляет значение ключа, хранящего id последнего созданного заказчика
  *
- * @param array $CustomerRepository объект репозитория заказчика
+ * @param array &$CustomerRepository объект репозитория заказчика
  * @param int $lastId значение, с которым нужно синхронизироваться
  *
  * @return bool упех обновления
  */
-function syncLastCustomerId(array $CustomerRepository, $lastId) {
+function syncLastCustomerId(array &$CustomerRepository, $lastId) {
     return Memcached\set(
         getMemcached($CustomerRepository),
         getLastCustomerIdKey(),
@@ -198,12 +198,12 @@ function syncLastCustomerId(array $CustomerRepository, $lastId) {
 /**
  * Создаёт новый шард в mysql
  *
- * @param array $CustomerRepository объект репозитория заказчика
+ * @param array &$CustomerRepository объект репозитория заказчика
  * @param int $shardId id шарда
  *
  * @return bool успех создания
  */
-function createShard(array $CustomerRepository, $shardId) {
+function createShard(array &$CustomerRepository, $shardId) {
     $MysqlFactory = &getMysqlFactory($CustomerRepository);
     $Mysql = &MysqlFactory\createShard($MysqlFactory, SHARD_CONFIG, $shardId);
 
@@ -221,14 +221,14 @@ function createShard(array $CustomerRepository, $shardId) {
 /**
  * Создаёт нового заказчика с сохранением в mysql и мемкеш
  *
- * @param array $CustomerRepository объект репозитория заказчика
+ * @param array &$CustomerRepository объект репозитория заказчика
  * @param string $login логин
  * @param string $fio ФИО
  * @param string $password пароль заказчика
  *
  * @return &array объект заказчика
  */
-function &create(array $CustomerRepository, $login, $fio, $password) {
+function &create(array &$CustomerRepository, $login, $fio, $password) {
     $Customer = &Customer\construct();
 
     Customer\setId($Customer, Memcached\increment(getMemcached($CustomerRepository), getLastCustomerIdKey()));

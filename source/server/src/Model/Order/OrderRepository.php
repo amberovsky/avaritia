@@ -41,22 +41,22 @@ function &construct(array &$Memcached, array &$Mysql) {
 }
 
 /**
- * @param array $OrderRepository объект репозитория заказа
+ * @param array &$OrderRepository объект репозитория заказа
  *
  * @return &array объект mysql
  */
-function &getMysql(array $OrderRepository) {
+function &getMysql(array &$OrderRepository) {
     return $OrderRepository[FIELD_MYSQL];
 }
 
 /**
  * @private
  *
- * @param array $OrderRepository репозиторий заказов
+ * @param array &$OrderRepository репозиторий заказов
  *
  * @return &array объект мемкеша
  */
-function &getMemcached(array $OrderRepository) {
+function &getMemcached(array &$OrderRepository) {
     return $OrderRepository[FIELD_MEMCACHED];
 }
 
@@ -95,10 +95,10 @@ function createMemcachedKeyForPrice($id) {
 /**
  * Сохраняет стоимость заказа в мемкеше
  *
- * @param array $OrderRepository объект репозитория заказа
+ * @param array &$OrderRepository объект репозитория заказа
  * @param int $price стоимость заказа
  */
-function savePriceToMemcached(array $OrderRepository, $price) {
+function savePriceToMemcached(array &$OrderRepository, $price) {
     Memcached\set(
         getMemcached($OrderRepository),
         createMemcachedKeyForPrice(Mysql\lastInsertId(getMysql($OrderRepository))),

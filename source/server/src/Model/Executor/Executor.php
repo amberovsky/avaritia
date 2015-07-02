@@ -29,11 +29,11 @@ function &construct() {
 }
 
 /**
- * @param array $Executor объект исполнителя
+ * @param array &$Executor объект исполнителя
  *
  * @return int id
  */
-function getId(array $Executor) {
+function getId(array &$Executor) {
     return $Executor[FIELD_ID];
 }
 
@@ -46,11 +46,11 @@ function setId(array &$Executor, $id) {
 }
 
 /**
- * @param array $Executor объект исполнителя
+ * @param array &$Executor объект исполнителя
  *
  * @return string фио
  */
-function getFio(array $Executor) {
+function getFio(array &$Executor) {
     return $Executor[FIELD_FIO];
 }
 
@@ -63,11 +63,11 @@ function setFio(array &$Executor, $fio) {
 }
 
 /**
- * @param array $Executor объект исполнителя
+ * @param array &$Executor объект исполнителя
  *
  * @return int зарплата
  */
-function getSalary(array $Executor) {
+function getSalary(array &$Executor) {
     return $Executor[FIELD_SALARY];
 }
 
@@ -80,11 +80,11 @@ function setSalary(array &$Executor, $salary) {
 }
 
 /**
- * @param array $Executor объект исполнителя
+ * @param array &$Executor объект исполнителя
  *
  * @return string логин
  */
-function getLogin(array $Executor) {
+function getLogin(array &$Executor) {
     return $Executor[FIELD_LOGIN];
 }
 

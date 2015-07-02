@@ -51,11 +51,11 @@ function &construct(array &$Config) {
 /**
  * @private
  *
- * @param array $ServiceManager объект сервис-менеджера
+ * @param array &$ServiceManager объект сервис-менеджера
  *
  * @return array конфигурация сервис-менеджера
  */
-function getConfig(array $ServiceManager) {
+function getConfig(array &$ServiceManager) {
     return $ServiceManager[FIELD_CONFIG];
 }
 

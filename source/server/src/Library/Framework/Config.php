@@ -33,11 +33,11 @@ function &construct() {
 }
 
 /**
- * @param array $Config объект конфига
+ * @param array &$Config объект конфига
  * @param string $item какой раздел конфига нужен
  *
  * @return &array раздел конфига
  */
-function &get(array $Config, $item) {
+function &get(array &$Config, $item) {
     return $Config[FIELD_DATA][$item];
 }

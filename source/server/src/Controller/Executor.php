@@ -11,15 +11,19 @@ load('Avaritia\Library\Framework\View');
 load('Avaritia\Library\Framework\ServiceManager');
 load('Avaritia\Library\Framework\Request');
 load('Avaritia\Model\Order\OrderRepository');
+load('Avaritia\Model\Order\Order');
 load('Avaritia\Model\Executor\Executor');
 load('Avaritia\Model\Executor\ExecutorRepository');
+load('Avaritia\Library\Framework\Application');
 
 use Avaritia\Library\Framework\View;
 use Avaritia\Library\Framework\ServiceManager;
 use Avaritia\Library\Framework\Request;
 use Avaritia\Model\Order\OrderRepository;
+use Avaritia\Model\Order\Order;
 use Avaritia\Model\Executor\Executor;
 use Avaritia\Model\Executor\ExecutorRepository;
+use Avaritia\Library\Framework\Application;
 
 // Поля класса
 const
@@ -44,23 +48,23 @@ function &construct(array &$ServiceManager) {
 /**
  * @private
  *
- * @param array $Script объект контроллера
+ * @param array &$Controller объект контроллера
  *
  * @return &array объект сервис-менеджера
  */
-function &getServiceManager(array $Script) {
-    return $Script[FIELD_SERVICE_MANAGER];
+function &getServiceManager(array &$Controller) {
+    return $Controller[FIELD_SERVICE_MANAGER];
 }
 
 /**
  * @private
  *
- * @param array $Script объект контроллера
+ * @param array &$Controller объект контроллера
  *
  * @return &array объект запроса
  */
-function &getRequest(array $Script) {
-    return $Script[FIELD_REQUEST];
+function &getRequest(array &$Controller) {
+    return $Controller[FIELD_REQUEST];
 }
 
 /**
@@ -71,16 +75,13 @@ function &getRequest(array $Script) {
  * @return &array объект отображения
  */
 function &indexAction(array &$Controller) {
-    $OrderRepository = &ServiceManager\get(getServiceManager($Controller), 'OrderRepository');
-
     $View = &View\construct();
 
     View\setTemplateName($View, 'executor\index');
     View\setVariables(
         $View,
         [
-            'ActiveUser'    => ServiceManager\get(getServiceManager($Controller), 'ActiveUser'),
-            'Orders'        => OrderRepository\fetchAll($OrderRepository),
+            'ActiveUser'    => ServiceManager\get(getServiceManager($Controller), 'ActiveUser')
         ]
     );
 
@@ -110,15 +111,37 @@ function cmdExecute(array &$Controller) {
     if (!OrderRepository\deleteFromMysql($OrderRepository, $orderId)) {
         return [
             'errorMsg'  => 'Такого заказа (уже) нет',
+            'deleted'   => 1,
         ];
     }
 
     $price = OrderRepository\getPriceFromMemcachedAndDeleteIt($OrderRepository, $orderId);
     $ExecutorRepository = ServiceManager\get($ServiceManager, 'ExecutorRepository');
     $ActiveUser = ServiceManager\get($ServiceManager, 'ActiveUser');
-    ExecutorRepository\updateSalary($ExecutorRepository, $ActiveUser, $price);
+    $Application = ServiceManager\get($ServiceManager, 'Application');
+
+    ExecutorRepository\updateSalary($ExecutorRepository, $ActiveUser, -$price - Application\getCommission($Application));
 
     return [
         'salary'    => Executor\getSalary($ActiveUser),
     ];
+}
+
+/**
+ * Подгрузка всех заказов
+ *
+ * @param array $Controller
+ *
+ * @return array сериализованный список заказов
+ */
+function cmdLoadOrders(array &$Controller) {
+    $OrderRepository = &ServiceManager\get(getServiceManager($Controller), 'OrderRepository');
+
+    return array_map(function (array $Order) {
+        return [
+            'id'    => Order\getId($Order),
+            'text'  => htmlspecialchars(Order\getText($Order), ENT_COMPAT | ENT_QUOTES),
+            'price' => Order\getPrice($Order),
+        ];
+    }, OrderRepository\fetchAll($OrderRepository));
 }

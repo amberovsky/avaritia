@@ -35,11 +35,11 @@ function &construct(array &$ServiceManager) {
 /**
  * @private
  *
- * @param array $Response объект ответа
+ * @param array &$Response объект ответа
  *
  * @return &array объект сервис-менеджера
  */
-function &getServiceManager(array $Response) {
+function &getServiceManager(array &$Response) {
     return $Response[FIELD_SERVICE_MANAGER];
 }
 

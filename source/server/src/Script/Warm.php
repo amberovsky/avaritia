@@ -33,7 +33,7 @@ use Avaritia\Model\Order\OrderRepository;
  * @param array &$ServiceManager объект сервис-менеджера
  */
 function run(array &$ServiceManager) {
-    $MysqlFactory = ServiceManager\getFactory($ServiceManager, 'Mysql');
+    $MysqlFactory = &ServiceManager\getFactory($ServiceManager, 'Mysql');
     $shardsConfig = MysqlFactory\getShardsConfig($MysqlFactory);
 
     // Заказчики
@@ -64,7 +64,7 @@ function run(array &$ServiceManager) {
     $ExecutorRepository = &ServiceManager\get($ServiceManager, 'ExecutorRepository');
     $maxExecutorId = 1;
     foreach ($shardsConfig[ExecutorRepository\SHARD_CONFIG] as $shardId => $_) {
-        $Mysql = MysqlFactory\createShard($MysqlFactory, ExecutorRepository\SHARD_CONFIG, $shardId);
+        $Mysql = &MysqlFactory\createShard($MysqlFactory, ExecutorRepository\SHARD_CONFIG, $shardId);
 
         $data = Mysql\query(
             $Mysql,

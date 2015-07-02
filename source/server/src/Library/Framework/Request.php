@@ -49,11 +49,11 @@ function setArgc(array &$Request, $argc) {
 }
 
 /**
- * @param array $Request объект запроса
+ * @param array &$Request объект запроса
  *
  * @return int количество аргументов при запуске
  */
-function getArgc(array $Request) {
+function getArgc(array &$Request) {
     return $Request[FIELD_ARGC];
 }
 
@@ -66,11 +66,11 @@ function setArgv(array &$Request, array $argv) {
 }
 
 /**
- * @param array $Request объект запроса
+ * @param array &$Request объект запроса
  *
  * @return array аргументы при запуске
  */
-function getArgv(array $Request) {
+function getArgv(array &$Request) {
     return $Request[FIELD_ARGV];
 }
 
@@ -91,7 +91,7 @@ function setQuery(array &$Request, array $query) {
  *
  * @return null|mixed значение переменной запроса
  */
-function getQueryParam(array $Request, $name, $default = null) {
+function getQueryParam(array &$Request, $name, $default = null) {
     return isset($Request[FIELD_QUERY][$name]) ? $Request[FIELD_QUERY][$name] : $default;
 }
 
@@ -112,7 +112,7 @@ function setPost(array &$Request, array $post) {
  *
  * @return null|mixed значение переменной запроса
  */
-function getPostParam(array $Request, $name, $default = null) {
+function getPostParam(array &$Request, $name, $default = null) {
     return isset($Request[FIELD_POST][$name]) ? $Request[FIELD_POST][$name] : $default;
 }
 
@@ -127,20 +127,20 @@ function setServer(array &$Request, array $server) {
 }
 
 /**
- * @param array $Request объект запроса
+ * @param array &$Request объект запроса
  *
  * @return array данные массива $_SERVER
  */
-function getServer(array $Request) {
+function getServer(array &$Request) {
     return $Request[FIELD_SERVER];
 }
 
 /**
- * @param array $Request объект запроса
+ * @param array &$Request объект запроса
  *
  * @return bool является ли запрос - ajax
  */
-function isXmlHttpRequest(array $Request) {
+function isXmlHttpRequest(array &$Request) {
     $server = getServer($Request);
 
     return (
@@ -150,37 +150,37 @@ function isXmlHttpRequest(array $Request) {
 }
 
 /**
- * @param array $Request объект запроса
+ * @param array &$Request объект запроса
  *
  * @return string метод HTTP запроса
  */
-function getMethod(array $Request) {
+function getMethod(array &$Request) {
     return $Request[FIELD_METHOD];
 }
 
 /**
- * @param array $Request объект запроса
+ * @param array &$Request объект запроса
  *
  * @return bool является ли запрос - POST
  */
-function isPost(array $Request) {
+function isPost(array &$Request) {
     return (getMethod($Request) == 'POST');
 }
 
 /**
- * @param array $Request объект запроса
+ * @param array &$Request объект запроса
  *
  * @return bool является ли запрос - GET
  */
-function isGet(array $Request) {
+function isGet(array &$Request) {
     return (getMethod($Request) == 'GET');
 }
 
 /**
- * @param array $Request объект запроса
+ * @param array &$Request объект запроса
  *
  * @return string document uri запроса
  */
-function getDocumentUri(array $Request) {
+function getDocumentUri(array &$Request) {
     return $Request[FIELD_DOCUMENT_URI];
 }

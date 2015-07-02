@@ -56,27 +56,27 @@ function &construct(array $pool) {
 /**
  * @private
  *
- * @param array $Memcached объект мемкеша
+ * @param array &$Memcached объект мемкеша
  *
  * @return mixed php объект мемкеша
  */
-function &getMemcacheObject(array $Memcached) {
+function &getMemcacheObject(array &$Memcached) {
     return $Memcached[FIELD_MEMCACHE_OBJECT];
 }
 
 /**
- * @param array $Memcached объект мемкеша
+ * @param array &$Memcached объект мемкеша
  *
  * @return array конфигурация пула
  */
-function getPoolConfig(array $Memcached) {
+function getPoolConfig(array &$Memcached) {
     return $Memcached[FIELD_POOL];
 }
 
 /**
  * @link http://php.net/manual/ru/memcache.set.php
  *
- * @param array $Memcached объект мемкеша
+ * @param array &$Memcached объект мемкеша
  * @param string $key имя ключа сохранения
  * @param mixed $var значение ключа
  * @param int|null $flag см документацию
@@ -84,44 +84,44 @@ function getPoolConfig(array $Memcached) {
  *
  * @return bool результат операции
  */
-function set(array $Memcached, $key, $var, $flag = null, $expire = 0) {
+function set(array &$Memcached, $key, $var, $flag = null, $expire = 0) {
     return memcache_set(getMemcacheObject($Memcached), $key, $var, $flag, $expire);
 }
 
 /**
  * @link http://php.net/manual/ru/memcache.get.php
  *
- * @param array $Memcached объект мемкеша
+ * @param array &$Memcached объект мемкеша
  * @param string|array $keys ключ(и) для выборки
  * @param array|null $flags см документацию
  *
  * @return mixed значение ключа
  */
-function get(array $Memcached, $keys, array $flags = null) {
+function get(array &$Memcached, $keys, array $flags = null) {
     return memcache_get(getMemcacheObject($Memcached), $keys, $flags);
 }
 
 /**
  * @see http://php.net/manual/ru/memcache.increment.php
  *
- * @param array $Memcached объект мемкеша
+ * @param array &$Memcached объект мемкеша
  * @param string $key ключ инкремента
  * @param int   $value стартовое значение
  *
  * @return int|bool новое значение ключа или false при ошибке
  */
-function increment(array $Memcached, $key, $value = 1) {
+function increment(array &$Memcached, $key, $value = 1) {
     return memcache_increment(getMemcacheObject($Memcached), $key, $value);
 }
 
 /**
  * @see http://php.net/manual/ru/memcache.delete.php
  *
- * @param array $Memcached объект мемкеша
+ * @param array &$Memcached объект мемкеша
  * @param string $key ключ на удаление
  *
  * @return bool результат операции
  */
-function delete(array $Memcached, $key) {
+function delete(array &$Memcached, $key) {
     return memcache_delete(getMemcacheObject($Memcached), $key);
 }

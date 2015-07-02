@@ -50,7 +50,9 @@ module.exports = function (grunt) {
 
         copy: {
             js: {
-                src: ['index.js', 'customer.js', 'api.js'].map(function ($file) { return DIR_CLIENT_JS + $file; }).concat(['./configuration/config.js']),
+                src: ['index.js', 'customer.js', 'api.js', 'executor.js']
+                        .map(function ($file) { return DIR_CLIENT_JS + $file; })
+                        .concat(['./configuration/config.js']),
                 dest: DIR_PUBLIC_JS,
                 expand: true,
                 flatten: true,

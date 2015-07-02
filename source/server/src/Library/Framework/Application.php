@@ -38,10 +38,16 @@ const
     MODE_WEB    = 0, /** запрос от веб-сервера */
     MODE_CLI    = 1; /** консольный запрос */
 
+// Константы конфигурирования приложения
+const
+    CONFIGURATION_SECTION       = 'application', /** определение секции конфигурирования приложения */
+    CONFIGURATION_COMMISSION    = 'commission'; /** комиссия системы */
+
 // Поля класса
 const
     FIELD_SERVICE_MANAGER   = 'Service_Manager', /** сервис-менеджер */
-    FIELD_MODE              = 'mode'; /** режим запуска */
+    FIELD_MODE              = 'mode', /** режим запуска */
+    FIELD_CONFIG            = 'config'; /** конфиг приложения */
 
 /**
  * @return &array объект приложения
@@ -50,7 +56,11 @@ function &construct() {
     $Application = [];
     setMode($Application, (php_sapi_name() == 'cli') ? MODE_CLI : MODE_WEB);
 
-    $ServiceManager = &ServiceManager\construct(Config\construct());
+    $Config = &Config\construct();
+
+    $Application[FIELD_CONFIG] = Config\get($Config, CONFIGURATION_SECTION);
+
+    $ServiceManager = &ServiceManager\construct($Config);
     ServiceManager\set($ServiceManager, 'Application', $Application);
     setServiceManager($Application, $ServiceManager);
 
@@ -104,12 +114,21 @@ function setMode(array &$Application, $mode) {
 }
 
 /**
- * @param array $Application объект отображения
+ * @param array &$Application объект приложения
  *
  * @return int режим запуска
  */
-function getMode(array $Application) {
+function getMode(array &$Application) {
     return $Application[FIELD_MODE];
+}
+
+/**
+ * @param array &$Application объект приложения
+ *
+ * @return int комиссия системы
+ */
+function getCommission(array &$Application) {
+    return (int) $Application[FIELD_CONFIG][CONFIGURATION_COMMISSION];
 }
 
 /**
@@ -121,11 +140,11 @@ function setServiceManager(array &$Application, array &$ServiceManager) {
 }
 
 /**
- * @param array $Application объект приложения
+ * @param array &$Application объект приложения
  *
  * @return &array объект сервис-менеджера
  */
-function &getServiceManager(array $Application) {
+function &getServiceManager(array &$Application) {
     return $Application[FIELD_SERVICE_MANAGER];
 }
 
