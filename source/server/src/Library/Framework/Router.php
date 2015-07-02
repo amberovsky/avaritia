@@ -74,8 +74,6 @@ function &construct(array &$Config, array &$Request, array &$Application) {
         }
     }
 
-    // TODO валидация cli
-
     $Router = [
         FIELD_CONFIG            => $config,
         FIELD_REQUEST           => &$Request,
