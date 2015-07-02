@@ -41,22 +41,22 @@ function &construct(array &$Memcached, array &$Mysql) {
 }
 
 /**
- * @param array $OrderRepository объект репозитория заказа
+ * @param array &$OrderRepository объект репозитория заказа
  *
  * @return &array объект mysql
  */
-function &getMysql(array $OrderRepository) {
+function &getMysql(array &$OrderRepository) {
     return $OrderRepository[FIELD_MYSQL];
 }
 
 /**
  * @private
  *
- * @param array $OrderRepository репозиторий заказов
+ * @param array &$OrderRepository репозиторий заказов
  *
  * @return &array объект мемкеша
  */
-function &getMemcached(array $OrderRepository) {
+function &getMemcached(array &$OrderRepository) {
     return $OrderRepository[FIELD_MEMCACHED];
 }
 
@@ -95,10 +95,10 @@ function createMemcachedKeyForPrice($id) {
 /**
  * Сохраняет стоимость заказа в мемкеше
  *
- * @param array $OrderRepository объект репозитория заказа
+ * @param array &$OrderRepository объект репозитория заказа
  * @param int $price стоимость заказа
  */
-function savePriceToMemcached(array $OrderRepository, $price) {
+function savePriceToMemcached(array &$OrderRepository, $price) {
     Memcached\set(
         getMemcached($OrderRepository),
         createMemcachedKeyForPrice(Mysql\lastInsertId(getMysql($OrderRepository))),
@@ -136,6 +136,29 @@ function fetchAll(array &$OrderRepository) {
 
     $Orders = [];
     $result = Mysql\query($Mysql, 'SELECT id, price, text FROM ' . DATABASE_NAME . '.' . TABLE_NAME);
+    while (($data = Mysql\fetchAssoc($Mysql, $result)) !== false) {
+        $Orders[] = &Order\unserializeFromMysql($data);
+    }
+
+    return $Orders;
+}
+
+/**
+ * Выборка заказов с id, не меньшим, чем указано
+ *
+ * @param array &$OrderRepository репозиторий заказа
+ * @param int $idOffset id
+ *
+ * @return array объекты таких заказов
+ */
+function fetchWithIdOffset(array &$OrderRepository, $idOffset) {
+    $Mysql = &getMysql($OrderRepository);
+
+    $Orders = [];
+    $result = Mysql\query(
+        $Mysql,
+        'SELECT id, price, text FROM ' . DATABASE_NAME . '.' . TABLE_NAME . ' WHERE id >= ' . (int) $idOffset
+    );
     while (($data = Mysql\fetchAssoc($Mysql, $result)) !== false) {
         $Orders[] = &Order\unserializeFromMysql($data);
     }

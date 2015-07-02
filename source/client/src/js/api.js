@@ -9,13 +9,15 @@ var api = {
      * Тип success callback
      * @name successCallback
      * @function
-     * @param {String|undefined} сообщение об ошибке, если есть
+     * @param {String|undefined} сообщение об успехе, если есть
      */
 
     /**
      * Тип fail callback
      * @name failCallback
      * @function
+     * @param {String|undefined} сообщение об ошибке, если есть
+     * @param {Object|undefined} данные ответа от сервера, если есть
      */
 
     /**
@@ -36,7 +38,7 @@ var api = {
                 if (!data) {
                     fail();
                 } else if (data.response.errorMsg) {
-                    fail(data.response.errorMsg);
+                    fail(data.response.errorMsg, data.response);
                 } else {
                     success(data.response);
                 }

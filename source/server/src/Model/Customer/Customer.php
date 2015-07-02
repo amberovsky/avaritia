@@ -37,11 +37,11 @@ function &construct() {
 }
 
 /**
- * @param array $Customer объект заказчика
+ * @param array &$Customer объект заказчика
  *
  * @return int id
  */
-function getId(array $Customer) {
+function getId(array &$Customer) {
     return $Customer[FIELD_ID];
 }
 
@@ -54,11 +54,11 @@ function setId(array &$Customer, $id) {
 }
 
 /**
- * @param array $Customer объект заказчика
+ * @param array &$Customer объект заказчика
  *
  * @return string логин
  */
-function getLogin(array $Customer) {
+function getLogin(array &$Customer) {
     return $Customer[FIELD_LOGIN];
 }
 
@@ -71,11 +71,11 @@ function setLogin(array &$Customer, $login) {
 }
 
 /**
- * @param array $Customer объект заказчика
+ * @param array &$Customer объект заказчика
  *
  * @return string фио
  */
-function getFio(array $Customer) {
+function getFio(array &$Customer) {
     return $Customer[FIELD_FIO];
 }
 
@@ -107,11 +107,11 @@ function &unserializeFromMemcache($data) {
 }
 
 /**
- * @param array $Customer объект заказчика
+ * @param array &$Customer объект заказчика
  *
  * @return string сериализованное для мемкеша представление заказчика
  */
-function serializeToMemcache(array $Customer) {
+function serializeToMemcache(array &$Customer) {
     return json_encode([
         KEY_ID      => getId($Customer),
         KEY_LOGIN   => getLogin($Customer),

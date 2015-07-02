@@ -17,6 +17,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Avaritia</title>
     <link rel="stylesheet" href="css/vendor/bootstrap-3.3.5.min.css">
+    <link rel="stylesheet" href="css/avaritia/avaritia_<?=REVISION; ?>.css">
 </head>
 <body>
 <div class="container">
@@ -32,6 +33,10 @@
                 <div class="panel panel-default">
                     <div class="panel-body text-center">
                         <?=Executor\getFio($ActiveUser); ?>
+                        <div>
+                            <i class="glyphicon glyphicon-ruble"></i>
+                            <b id="salary"><?=Executor\getSalary($ActiveUser); ?></b>
+                        </div>
                         <form method="POST" action="/index/logout">
                             <div class="form-group">
                                 <button type="submit" name="logout" class="btn btn-danger">Выход</button>
@@ -50,29 +55,25 @@
     <div class="row">
         <div class="col-md-12">
             <h2>Список заказов</h2>
-            <div class="alert alert-success">Заказ успешно выполнен, на счет зачислено 100.50 руб.</div>
+            <div class="alert alert-success" id="successMessage"></div>
+            <div class="alert alert-danger" id="failMessage"></div>
             <table class="table table-striped">
+                <thead>
                 <tr>
-                    <th></th>
-                    <th class="text-center">Стоимость, руб.</th>
+                    <th>Id</th>
+                    <th class="text-center">Стоимость, руб</th>
                     <th>Текст заказа</th>
                     <th></th>
                 </tr>
-                <? foreach ($Orders as $Order): ?>
-                    <tr>
-                        <td>#<?=Order\getId($Order); ?></td>
-                        <td class="text-center"><?=Order\getPrice($Order); ?></td>
-                        <td>
-                            <textarea><?=htmlspecialchars(Order\getText($Order), ENT_COMPAT | ENT_QUOTES); ?></textarea>
-                        </td>
-                        <td>
-                            <button class="btn btn-sm btn-primary">Выполнить</button>
-                        </td>
-                    </tr>
-                <? endforeach; ?>
+                </thead>
+                <tbody id="orders-list">
+                <!-- список заказов подгружается ajax-ом -->
+                </tbody>
             </table>
         </div>
     </div>
+    <input type="hidden" id="token" value="<?=Session\getToken(); ?>" />
+    <div class="loader modal fade"><i></i></div>
 </div>
 <!-- scripts -->
 <script src="js/vendor/jquery-2.1.4.min.js"></script>

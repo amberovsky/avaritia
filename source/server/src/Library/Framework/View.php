@@ -39,11 +39,11 @@ function setRenderStrategy(array &$View, $renderStrategy) {
 }
 
 /**
- * @param array $View объект отображения
+ * @param array &$View объект отображения
  *
  * @return int стратегия рендеринга
  */
-function getRenderStrategy(array $View) {
+function getRenderStrategy(array &$View) {
     return $View[FIELD_RENDER_STRATEGY];
 }
 
@@ -56,11 +56,11 @@ function setTemplateName(array &$View, $templateName) {
 }
 
 /**
- * @param array $View объект отображения
+ * @param array &$View объект отображения
  *
  * @return string имя шаблона для рендеринга
  */
-function getTemplateName(array $View) {
+function getTemplateName(array &$View) {
     return $View[FIELD_TEMPLATE_NAME];
 }
 
@@ -73,33 +73,33 @@ function setVariables(array &$View, array $variables) {
 }
 
 /**
- * @param array $View объект отображения
+ * @param array &$View объект отображения
  *
  * @return array список перменных для шаблона
  */
-function getVariables(array $View) {
+function getVariables(array &$View) {
     return $View[FIELD_VARIABLES];
 }
 
 /**
  * @private
  *
- * @param array $View объект отображения
+ * @param array &$View объект отображения
  *
  * @return array данные ответа
  */
-function renderJson(array $View) {
+function renderJson(array &$View) {
     return getVariables($View);
 }
 
 /**
  * @private
  *
- * @param array $View объект отображения
+ * @param array &$View объект отображения
  *
  * @return string отрендеренный plain
  */
-function renderPlain(array $View) {
+function renderPlain(array &$View) {
     extract(getVariables($View));
     ob_start();
     require(PROJECT_SOURCE . '/../view/' . str_replace('\\', '/', getTemplateName($View)) . '.phtml');

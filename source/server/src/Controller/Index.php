@@ -44,23 +44,23 @@ function &construct(array &$ServiceManager) {
 /**
  * @private
  *
- * @param array $Script объект контроллера
+ * @param array &$Controller объект контроллера
  *
  * @return &array объект сервис-менеджера
  */
-function &getServiceManager(array $Script) {
-    return $Script[FIELD_SERVICE_MANAGER];
+function &getServiceManager(array &$Controller) {
+    return $Controller[FIELD_SERVICE_MANAGER];
 }
 
 /**
  * @private
  *
- * @param array $Script объект контроллера
+ * @param array &$Controller объект контроллера
  *
  * @return &array объект запроса
  */
-function &getRequest(array $Script) {
-    return $Script[FIELD_REQUEST];
+function &getRequest(array &$Controller) {
+    return $Controller[FIELD_REQUEST];
 }
 
 /**

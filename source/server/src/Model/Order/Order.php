@@ -27,11 +27,11 @@ function &construct() {
 }
 
 /**
- * @param array $Order объект заказа
+ * @param array &$Order объект заказа
  *
  * @return int id
  */
-function getId(array $Order) {
+function getId(array &$Order) {
     return $Order[FIELD_ID];
 }
 
@@ -44,11 +44,11 @@ function setId(array &$Order, $id) {
 }
 
 /**
- * @param array $Order объект заказа
+ * @param array &$Order объект заказа
  *
  * @return int стоимость
  */
-function getPrice(array $Order) {
+function getPrice(array &$Order) {
     return $Order[FIELD_PRICE];
 }
 
@@ -61,11 +61,11 @@ function setPrice(array &$Order, $price) {
 }
 
 /**
- * @param array $Order объект заказа
+ * @param array &$Order объект заказа
  *
  * @return string текст
  */
-function getText(array $Order) {
+function getText(array &$Order) {
     return $Order[FIELD_TEXT];
 }
 

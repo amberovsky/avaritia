@@ -27,11 +27,11 @@ const
     FIELD_CONFIG    = 'config'; /** конфиг мемкеша */
 
 /**
- * @param array $ServiceManager объект сервис-менеджер
+ * @param array &$ServiceManager объект сервис-менеджер
  *
  * @return &array объект фабрики
  */
-function &construct(array $ServiceManager) {
+function &construct(array &$ServiceManager) {
     $config = &Config\get(ServiceManager\get($ServiceManager, 'Config'), CONFIGURATION_SECTION);
 
     foreach ($config as $name => $pool) {
@@ -67,22 +67,22 @@ function &construct(array $ServiceManager) {
 /**
  * @private
  *
- * @param array $MemcachedFactory объект фабрики мемкешей
+ * @param array &$MemcachedFactory объект фабрики мемкешей
  *
  * @return &array текущие инстансы мемкешей
  */
-function &getInstances(array $MemcachedFactory) {
+function &getInstances(array &$MemcachedFactory) {
     return $MemcachedFactory[FIELD_INSTANCES];
 }
 
 /**
  * @private
  *
- * @param array $MemcachedFactory объект фабрики мемкешей
+ * @param array &$MemcachedFactory объект фабрики мемкешей
  *
  * @return &array полный конфиг мемкешей
  */
-function &getConfig(array $MemcachedFactory) {
+function &getConfig(array &$MemcachedFactory) {
     return $MemcachedFactory[FIELD_CONFIG];
 }
 

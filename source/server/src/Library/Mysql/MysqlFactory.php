@@ -33,11 +33,11 @@ const
     FIELD_CONFIG            = 'config'; /** конфиг mysql */
 
 /**
- * @param array $ServiceManager объект сервис-менеджер
+ * @param array &$ServiceManager объект сервис-менеджер
  *
  * @return &array объект фабрики
  */
-function &construct(array $ServiceManager) {
+function &construct(array &$ServiceManager) {
     $config = &Config\get(ServiceManager\get($ServiceManager, 'Config'), CONFIGURATION_SECTION);
 
     if (isset($config[CONFIGURATION_INSTANCES])) {
@@ -106,33 +106,33 @@ function validateInstanceConfig($name, $config, $shard = null) {
 /**
  * @private
  *
- * @param array $MysqlFactory объект фабрики mysql
+ * @param array &$MysqlFactory объект фабрики mysql
  *
  * @return &array текущие инстансы mysql
  */
-function &getInstances(array $MysqlFactory) {
+function &getInstances(array &$MysqlFactory) {
     return $MysqlFactory[FIELD_INSTANCES];
 }
 
 /**
  * @private
  *
- * @param array $MysqlFactory объект фабрики mysql
+ * @param array &$MysqlFactory объект фабрики mysql
  *
  * @return &array текущие шардовые инстансы mysql
  */
-function &getShardInstances(array $MysqlFactory) {
+function &getShardInstances(array &$MysqlFactory) {
     return $MysqlFactory[FIELD_SHARD_INSTANCES];
 }
 
 /**
  * @private
  *
- * @param array $MysqlFactory объект фабрики mysql
+ * @param array &$MysqlFactory объект фабрики mysql
  *
  * @return &array полный конфиг mysql
  */
-function &getConfig(array $MysqlFactory) {
+function &getConfig(array &$MysqlFactory) {
     return $MysqlFactory[FIELD_CONFIG];
 }
 
@@ -158,11 +158,11 @@ function &create(array &$MysqlFactory, $name) {
 }
 
 /**
- * @param array $MysqlFactory объект фабрики mysql
+ * @param array &$MysqlFactory объект фабрики mysql
  *
  * @return array конфигурация шардов
  */
-function getShardsConfig(array $MysqlFactory) {
+function getShardsConfig(array &$MysqlFactory) {
     return getConfig($MysqlFactory)[CONFIGURATION_SHARD_INSTANCES];
 }
 

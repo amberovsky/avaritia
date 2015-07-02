@@ -48,20 +48,20 @@ function &construct(array &$Memcached, array &$MysqlFactory) {
 /**
  * @private
  *
- * @param array $ExecutorRepository репозиторий исполнителя
+ * @param array &$ExecutorRepository репозиторий исполнителя
  *
  * @return &array объект мемкеша
  */
-function &getMemcached(array $ExecutorRepository) {
+function &getMemcached(array &$ExecutorRepository) {
     return $ExecutorRepository[FIELD_MEMCACHED];
 }
 
 /**
- * @param array $ExecutorRepository объект репозитория исполнителя
+ * @param array &$ExecutorRepository объект репозитория исполнителя
  *
  * @return &array объект фабрики mysql
  */
-function &getMysqlFactory(array $ExecutorRepository) {
+function &getMysqlFactory(array &$ExecutorRepository) {
     return $ExecutorRepository[FIELD_MYSQL_FACTORY];
 }
 
@@ -97,12 +97,12 @@ function createMemcachedKeyForPasswordHash($login) {
 /**
  * Обновляет значение ключа, хранящего id последнего созданного исполнителя
  *
- * @param array $ExecutorRepository объект репозитория исполнителя
+ * @param array &$ExecutorRepository объект репозитория исполнителя
  * @param int $lastId значение, с которым нужно синхронизироваться
  *
  * @return bool упех обновления
  */
-function syncLastExecutorId(array $ExecutorRepository, $lastId) {
+function syncLastExecutorId(array &$ExecutorRepository, $lastId) {
     return Memcached\set(
         getMemcached($ExecutorRepository),
         getLastExecutorIdKey(),
@@ -113,13 +113,13 @@ function syncLastExecutorId(array $ExecutorRepository, $lastId) {
 /**
  * Сохраняет хешированный пароль исполнителя в мемкеше
  *
- * @param array $ExecutorRepository объект репозитория исполнителя
- * @param array $Executor объект исполнителя
+ * @param array &$ExecutorRepository объект репозитория исполнителя
+ * @param array &$Executor объект исполнителя
  * @param string $passwordHash хешированный пароль
  *
  * @return bool результат сохранения
  */
-function savePasswordHashToMemcached(array $ExecutorRepository, array $Executor, $passwordHash) {
+function savePasswordHashToMemcached(array &$ExecutorRepository, array &$Executor, $passwordHash) {
     return Memcached\set(
         getMemcached($ExecutorRepository),
         createMemcachedKeyForPasswordHash(Executor\getLogin($Executor)),
@@ -130,23 +130,23 @@ function savePasswordHashToMemcached(array $ExecutorRepository, array $Executor,
 /**
  * Создаёт новый шард в mysql
  *
- * @param array $ExecutorRepository объект репозитория исполнителя
+ * @param array &$ExecutorRepository объект репозитория исполнителя
  * @param int $shardId id шарда
  *
  * @return bool успех создания
  */
-function createShard(array $ExecutorRepository, $shardId) {
+function createShard(array &$ExecutorRepository, $shardId) {
     $MysqlFactory = &getMysqlFactory($ExecutorRepository);
     $Mysql = &MysqlFactory\createShard($MysqlFactory, SHARD_CONFIG, $shardId);
 
     Mysql\query($Mysql, 'CREATE DATABASE ' . DATABASE_NAME . ' CHARACTER SET utf8 COLLATE utf8_unicode_ci');
     return Mysql\query($Mysql, '
         CREATE TABLE ' . DATABASE_NAME . '.' . TABLE_NAME . ' (
-          id            INT UNSIGNED  NOT NULL,
-          login         VARCHAR(16)   NOT NULL,
-          salary        INT UNSIGNED  NOT NULL,
-          fio           VARCHAR(32)   NOT NULL,
-          password_hash VARCHAR(60)   NOT NULL,
+          id            INT UNSIGNED    NOT NULL,
+          login         VARCHAR(16)     NOT NULL,
+          salary        INT             NOT NULL,
+          fio           VARCHAR(32)     NOT NULL,
+          password_hash VARCHAR(60)     NOT NULL,
 
           INDEX(id)
         ) ENGINE=InnoDB;
@@ -156,7 +156,7 @@ function createShard(array $ExecutorRepository, $shardId) {
 /**
  * Создаёт нового исполнителя с сохранением в mysql и мемкеш
  *
- * @param array $ExecutorRepository объект репозитория исполнителя
+ * @param array &$ExecutorRepository объект репозитория исполнителя
  * @param string $login логин
  * @param string $fio ФИО
  * @param int $salary
@@ -164,7 +164,7 @@ function createShard(array $ExecutorRepository, $shardId) {
  *
  * @return &array объект исполнителя
  */
-function &create(array $ExecutorRepository, $login, $fio, $salary, $password) {
+function &create(array &$ExecutorRepository, $login, $fio, $salary, $password) {
     $Executor = &Executor\construct();
 
     Executor\setId($Executor, Memcached\increment(getMemcached($ExecutorRepository), getLastExecutorIdKey()));
@@ -186,13 +186,13 @@ function &create(array $ExecutorRepository, $login, $fio, $salary, $password) {
  *
  * Создаёт нового исполнителя в mysql
  *
- * @param array $ExecutorRepository объект репозитория исполнителя
- * @param array $Executor объект исполнителя
+ * @param array &$ExecutorRepository объект репозитория исполнителя
+ * @param array &$Executor объект исполнителя
  * @param string $passwordHash хешированный пароль исполнителя
  *
  * @return bool успех создания
  */
-function createInMysql(array $ExecutorRepository, array $Executor, $passwordHash) {
+function createInMysql(array &$ExecutorRepository, array &$Executor, $passwordHash) {
     $Mysql = &MysqlFactory\createShard(
         getMysqlFactory($ExecutorRepository),
         SHARD_CONFIG,
@@ -240,13 +240,13 @@ function createMemcachedKeyForLogin($login) {
 /**
  * Сохраняет логин-id исполнителя в мемкеше
  *
- * @param array $ExecutorRepository объект репозитория исполнителя
+ * @param array &$ExecutorRepository объект репозитория исполнителя
  * @param string $login логин
  * @param int $id id
  *
  * @return bool результат сохранения
  */
-function saveLoginToMemcached(array $ExecutorRepository, $login, $id) {
+function saveLoginToMemcached(array &$ExecutorRepository, $login, $id) {
     return Memcached\set(
         getMemcached($ExecutorRepository),
         createMemcachedKeyForLogin($login),
@@ -255,12 +255,12 @@ function saveLoginToMemcached(array $ExecutorRepository, $login, $id) {
 }
 
 /**
- * @param array $ExecutorRepository объект репозитория исполнителя
+ * @param array &$ExecutorRepository объект репозитория исполнителя
  * @param string $login логин исполнителя
  *
  * @return &array|null объект исполнителя или null, если таковой не найден
  */
-function &fetch(array $ExecutorRepository, $login) {
+function &fetch(array &$ExecutorRepository, $login) {
     $Memcached = &getMemcached($ExecutorRepository);
     $id = Memcached\get($Memcached, createMemcachedKeyForLogin($login));
 

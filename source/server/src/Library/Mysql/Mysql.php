@@ -31,11 +31,11 @@ function &construct(array $config) {
 }
 
 /**
- * @param array $Mysql объект инстанса mysql
+ * @param array &$Mysql объект инстанса mysql
  *
  * @return array конфиг инстанса
  */
-function getConfig(array $Mysql) {
+function getConfig(array &$Mysql) {
     return $Mysql[FIELD_CONFIG];
 }
 
@@ -77,7 +77,6 @@ function getMysqlLink(array &$Mysql) {
  */
 function query(array &$Mysql, $query) {
     $mysqlLink = getMysqlLink($Mysql);
-
     $result = mysql_query($query, $mysqlLink);
 
     if ($result === false) {

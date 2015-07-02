@@ -91,33 +91,33 @@ function &construct(array &$Config, array &$Request, array &$Application) {
 /**
  * @private
  *
- * @param array $Router объект роута
+ * @param array &$Router объект роута
  *
  * @return &array объект запроса
  */
-function &getRequest(array $Router) {
+function &getRequest(array &$Router) {
     return $Router[FIELD_REQUEST];
 }
 
 /**
  * @private
  *
- * @param array $Router объект роута
+ * @param array &$Router объект роута
  *
  * @return array раздел конфигурации роута
  */
-function getConfig(array $Router) {
+function getConfig(array &$Router) {
     return $Router[FIELD_CONFIG];
 }
 
 /**
  * @private
  *
- * @param array $Router объект роута
+ * @param array &$Router объект роута
  *
  * @return &array объект приложения
  */
-function &getApplication(array $Router) {
+function &getApplication(array &$Router) {
     return $Router[FIELD_APPLICATION];
 }
 
@@ -184,11 +184,11 @@ function setControllerName(array &$Router, $name) {
 }
 
 /**
- * @param array $Router объект роута
+ * @param array &$Router объект роута
  *
  * @return string имя контроллера
  */
-function getControllerName(array $Router) {
+function getControllerName(array &$Router) {
     return $Router[FIELD_CONTROLLER_NAME];
 }
 
@@ -201,19 +201,19 @@ function setActionName(array &$Router, $name) {
 }
 
 /**
- * @param array $Router объект роута
+ * @param array &$Router объект роута
  *
  * @return string имя экшена
  */
-function getActionName(array $Router) {
+function getActionName(array &$Router) {
     return $Router[FIELD_ACTION_NAME];
 }
 
 /**
- * @param array $Router объект роута
+ * @param array &$Router объект роута
  *
  * @return string имя сматченного роута
  */
-function getRouteName(array $Router) {
+function getRouteName(array &$Router) {
     return $Router[FIELD_ROUTE_NAME];
 }
