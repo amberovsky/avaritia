@@ -24,7 +24,7 @@ deploy_dir=${deploy_base_dir}${revision}
 symlink=${deploy_base_dir}www
 
 # команды рестарта php-fpm
-restart_fpm="sudo /usr/sbin/service php5-fpm reload"
+restart_fpm="sudo /usr/sbin/service php5-fpm restart"
 
 # 1. создаём каталог
 printf "#1 каталог деплоя ${deploy_dir}\n"

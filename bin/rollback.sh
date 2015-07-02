@@ -14,7 +14,7 @@ deploy_base_dir=/home/www/avaritia/
 symlink=${deploy_base_dir}www
 
 # команды рестарта php-fpm
-restart_fpm="sudo /usr/sbin/service php5-fpm reload"
+restart_fpm="sudo /usr/sbin/service php5-fpm restart"
 
 # получаем список ревизий в массив
 revisions=($( (ls ${deploy_base_dir} | grep -E '^[[:digit:]]+$' | sort -r)))
