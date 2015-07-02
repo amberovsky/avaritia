@@ -15,6 +15,7 @@ load('Avaritia\Model\Order\Order');
 load('Avaritia\Model\Executor\Executor');
 load('Avaritia\Model\Executor\ExecutorRepository');
 load('Avaritia\Library\Framework\Application');
+load('Avaritia\Library\Session');
 
 use Avaritia\Library\Framework\View;
 use Avaritia\Library\Framework\ServiceManager;
@@ -24,6 +25,7 @@ use Avaritia\Model\Order\Order;
 use Avaritia\Model\Executor\Executor;
 use Avaritia\Model\Executor\ExecutorRepository;
 use Avaritia\Library\Framework\Application;
+use Avaritia\Library\Session;
 
 // Поля класса
 const
@@ -100,8 +102,9 @@ function cmdExecute(array &$Controller) {
     $ServiceManager = &getServiceManager($Controller);
 
     $orderId = (int) Request\getPostParam($Request, 'orderId');
+    $token = Request\getPostParam($Request, 'token');
 
-    if ($orderId < 1) {
+    if (($orderId < 1) || is_null($token) || ($token !== Session\getToken())){
         return [
             'errorMsg'  => 'Неверный id заказа',
         ];
@@ -135,6 +138,15 @@ function cmdExecute(array &$Controller) {
  * @return array сериализованный список заказов
  */
 function cmdLoadOrders(array &$Controller) {
+    $Request = &getRequest($Controller);
+    $token = Request\getPostParam($Request, 'token');
+
+    if (is_null($token) || ($token !== Session\getToken())) {
+        return [
+            'errorMsg'  => 'Неверный токен',
+        ];
+    }
+
     $OrderRepository = &ServiceManager\get(getServiceManager($Controller), 'OrderRepository');
 
     return array_map(function (array $Order) {
@@ -144,4 +156,33 @@ function cmdLoadOrders(array &$Controller) {
             'price' => Order\getPrice($Order),
         ];
     }, OrderRepository\fetchAll($OrderRepository));
+}
+
+/**
+ * Подгрузка новых заказов, если есть
+ *
+ * @param array &$Controller объект контроллера
+ *
+ * @return array сериализованный список заказов
+ */
+function cmdCheckNew(array &$Controller) {
+    $Request = &getRequest($Controller);
+    $token = Request\getPostParam($Request, 'token');
+    $fromId = (int) Request\getPostParam($Request, 'fromId');
+
+    if (($fromId < 1) || is_null($token) || ($token !== Session\getToken())) {
+        return [
+            'errorMsg'  => 'Неверные данные',
+        ];
+    }
+
+    $OrderRepository = &ServiceManager\get(getServiceManager($Controller), 'OrderRepository');
+
+    return array_map(function (array $Order) {
+        return [
+            'id'    => Order\getId($Order),
+            'text'  => htmlspecialchars(Order\getText($Order), ENT_COMPAT | ENT_QUOTES),
+            'price' => Order\getPrice($Order),
+        ];
+    }, OrderRepository\fetchWithIdOffset($OrderRepository, $fromId));
 }

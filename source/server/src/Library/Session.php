@@ -34,6 +34,14 @@ function init(array &$Memcached) {
 
     session_set_cookie_params(3600, '/', '', false, true);
     session_start();
+}
+
+/**
+ * @static
+ *
+ * Обновление сессии
+ */
+function regenerate() {
     session_regenerate_id(true);
 }
 

@@ -144,6 +144,29 @@ function fetchAll(array &$OrderRepository) {
 }
 
 /**
+ * Выборка заказов с id, не меньшим, чем указано
+ *
+ * @param array &$OrderRepository репозиторий заказа
+ * @param int $idOffset id
+ *
+ * @return array объекты таких заказов
+ */
+function fetchWithIdOffset(array &$OrderRepository, $idOffset) {
+    $Mysql = &getMysql($OrderRepository);
+
+    $Orders = [];
+    $result = Mysql\query(
+        $Mysql,
+        'SELECT id, price, text FROM ' . DATABASE_NAME . '.' . TABLE_NAME . ' WHERE id >= ' . (int) $idOffset
+    );
+    while (($data = Mysql\fetchAssoc($Mysql, $result)) !== false) {
+        $Orders[] = &Order\unserializeFromMysql($data);
+    }
+
+    return $Orders;
+}
+
+/**
  * Удаляет заказ из mysql
  *
  * @param array &$OrderRepository репозиторий заказа

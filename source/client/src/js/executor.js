@@ -6,50 +6,28 @@
 
 var AvaritiaExecutor = {
     /**
+     * @var {Integer} последний максимальный id згруженного заказа
+     */
+    lastMaxOrderId: 0,
+
+    /**
      * Инициализация страницы
      */
     init: function () {
         this
-            .loadOrdersList()
-            .executeOrder();
-    },
-
-    /**
-     * Загрузка списка заказов
-     *
-     * @returns {AvaritiaExecutor}
-     */
-    loadOrdersList: function() {
-        var $this = this;
-        $this.showLoader();
-
-        api.cmd(
-            '/executor/loadOrders',
-            {
-                token: $('#token').val()
-            },
-            function (data) {
-                for (var i in data) {
-                    if (data.hasOwnProperty(i)) {
-                        $this.createOrderRow(data[i]);
-                    }
-                }
-
-                $this.hideLoader();
-            },
-            function (errorMsg) { $this.onRequestFail(errorMsg); }
-        );
-
-        return $this;
+            .checkNewOrders(this)
+            .initExecuteOrder();
     },
 
     /**
      * Рисует строку с данными заказа
      *
+     * @param {AvaritiaExecutor} $this
      * @param {Object} orderData
      */
-    createOrderRow: function(orderData) {
-        var table         = $('#orders-list'),
+    createOrderRow: function($this, orderData) {
+        var
+            table         = $('#orders-list'),
             tr            = $('<tr></tr>').addClass('order-item'),
             tdId          = $('<td></td>').text(orderData.id),
             tdPrice       = $('<td></td>').addClass('text-center').text(orderData.price),
@@ -70,15 +48,17 @@ var AvaritiaExecutor = {
             .append(tdButton);
 
         table.append(tr);
+
+        $this.lastMaxOrderId = Math.max($this.lastMaxOrderId, orderData.id);
     },
 
     /**
-     * Выпонение заказа
+     * Выполнение заказа
      */
-    executeOrder: function() {
+    initExecuteOrder: function () {
         var $this = this;
 
-        $(document).on('click', '.execute-order', function() {
+        $(document).on('click', '.execute-order', function () {
             $this.showLoader();
 
             var
@@ -105,6 +85,29 @@ var AvaritiaExecutor = {
                 }
             );
         });
+    },
+
+    /**
+     * Проверяет новые заказы и добавляет, если есть
+     */
+    checkNewOrders: function ($this) {
+        api.cmd(
+            '/executor/checkNew',
+            {
+                fromId: $this.lastMaxOrderId + 1,
+                token: $('#token').val()
+            },
+            function (data) {
+                for (var i in data) {
+                    if (data.hasOwnProperty(i)) {
+                        $this.createOrderRow($this, data[i]);
+                    }
+                }
+
+                setTimeout(function () { $this.checkNewOrders($this); }, 2000);
+            },
+            function (errorMsg) { $this.onRequestFail(errorMsg); }
+        );
     },
 
     /**

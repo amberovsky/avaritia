@@ -206,6 +206,8 @@ function run(array &$Application) {
                 $ActiveUser = &ExecutorRepository\fetch($ExecutorRepository, $userData[0]);
 
             }
+
+            Session\regenerate();
         } else {
             if ($routeName !== 'index') {
                 header('Location: /index', true, 307);
