@@ -128,3 +128,13 @@ function lastInsertId(array &$Mysql) {
 function affectedRows(array &$Mysql) {
     return mysql_affected_rows(getMysqlLink($Mysql));
 }
+
+/**
+ * @param array &$Mysql объект инстанса mysql
+ * @param string $item неэкранировання строка
+ *
+ * @return string экранированная строка
+ */
+function escape(array &$Mysql, $item) {
+    return mysql_real_escape_string($item, getMysqlLink($Mysql));
+}

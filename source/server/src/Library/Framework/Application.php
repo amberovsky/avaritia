@@ -221,6 +221,7 @@ function run(array &$Application) {
     if (Request\isXmlHttpRequest($Request)) { // ajax запросы просто возвращают массив данных
         $View = &View\construct();
         View\setVariables($View, call_user_func_array($actionFunction, [&$Controller]));
+        View\setRenderStrategy($View, View\RENDER_STRATEGY_JSON);
     } else {
         $View = &call_user_func_array($actionFunction, [&$Controller]);
     }

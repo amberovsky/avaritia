@@ -5,10 +5,14 @@
  */
 
 var
-    DIR_PUBLIC  = './public/js/avaritia/', // целевой каталог
-    DIR_CLIENT  = './source/client/src', // каталог с исходными файлами
-    p           = require('path'),
-    revision    = null; // текущая ревизия
+    DIR_PUBLIC      = './public/', // целевой каталог
+    DIR_PUBLIC_JS   = DIR_PUBLIC + 'js/avaritia/', // целевой каталог с js файлами
+    DIR_PUBLIC_CSS  = DIR_PUBLIC + 'css/avaritia/', // целевой каталог с css файлами
+    DIR_CLIENT      = './source/client/src/', // каталог с исходными файлами
+    DIR_CLIENT_JS   = DIR_CLIENT + 'js/', // каталог с иходными js файлами
+    DIR_CLIENT_CSS  = DIR_CLIENT + 'css/', // каталог с исходными css файлами
+    p               = require('path'),
+    revision        = null; // текущая ревизия
 
 module.exports = function (grunt) {
     if (!grunt.option('revision')) {
@@ -16,6 +20,17 @@ module.exports = function (grunt) {
     }
 
     revision = grunt.option('revision');
+
+    var
+        /**
+         * @param {string} dest целевой каталог
+         * @param {string} src  целевое имя файла
+         *
+         * @returns {string} целевое имя файла с ревизией
+         */
+        renameWithRevision = function(dest, src) {
+            return dest + src.replace(/(\..*)$/, '_' + revision + '$1');
+        };
 
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-copy');
@@ -29,18 +44,25 @@ module.exports = function (grunt) {
         pkg: require('./package.json'),
 
         clean: {
-            js: [DIR_PUBLIC]
+            js: [DIR_PUBLIC_JS],
+            css: [DIR_PUBLIC_CSS]
         },
 
         copy: {
             js: {
-                src: ['index.js', 'customer.js', 'api.js'].map(function ($file) { return DIR_CLIENT + '/' + $file; }).concat(['./configuration/config.js']),
-                dest: DIR_PUBLIC,
+                src: ['index.js', 'customer.js', 'api.js'].map(function ($file) { return DIR_CLIENT_JS + $file; }).concat(['./configuration/config.js']),
+                dest: DIR_PUBLIC_JS,
                 expand: true,
                 flatten: true,
-                rename: function(dest, src) {
-                    return dest + src.replace(/(\..*)$/, '_' + revision + '$1');
-                }
+                rename: renameWithRevision
+            },
+
+            css: {
+                src: DIR_CLIENT_CSS + 'avaritia.css',
+                dest: DIR_PUBLIC_CSS,
+                expand: true,
+                flatten: true,
+                rename: renameWithRevision
             }
         },
 
@@ -51,12 +73,12 @@ module.exports = function (grunt) {
                 mangle: false
             },
 
-            prod: {
+            production: {
                 files: [{
                     expand: true,
-                    cwd: DIR_PUBLIC,
+                    cwd: DIR_PUBLIC_JS,
                     src: '*.js',
-                    dest: DIR_PUBLIC
+                    dest: DIR_PUBLIC_JS
                 }]
             }
         }

@@ -1,0 +1,26 @@
+.loader {
+    background: #000;
+    opacity: 0.4;
+}
+
+.loader.visible {
+    display: block;
+}
+
+.loader i {
+    width: 43px;
+    height: 11px;
+    background: url("../../images/loader.gif");
+    position: fixed;
+    left: 50%;
+    top: 30%;
+    margin-left: -21px;
+}
+
+#successMessage {
+    display: none;
+}
+
+#failMessage {
+    display: none;
+}
