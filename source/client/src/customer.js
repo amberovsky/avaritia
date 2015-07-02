@@ -1,5 +1,0 @@
-/**
- * @author amberovsky
- *
- * Заказчики
- */

@@ -203,10 +203,10 @@ function createInMysql(array $ExecutorRepository, array $Executor, $passwordHash
         INSERT INTO ' . DATABASE_NAME . '.' . TABLE_NAME . '
           (id, login, salary, fio, password_hash)
         VALUES (
-          \'' . mysql_real_escape_string(Executor\getId($Executor)) . '\',
-          \'' . mysql_real_escape_string(Executor\getLogin($Executor)) . '\',
-          \'' . mysql_real_escape_string(Executor\getSalary($Executor)) . '\',
-          \'' . mysql_real_escape_string(Executor\getFio($Executor)) . '\',
+          \'' . (int) Executor\getId($Executor) . '\',
+          \'' . Mysql\escape($Mysql, Executor\getLogin($Executor)) . '\',
+          \'' . Mysql\escape($Mysql, Executor\getSalary($Executor)) . '\',
+          \'' . Mysql\escape($Mysql, Executor\getFio($Executor)) . '\',
           \'' . $passwordHash . '\'
         )
     ');

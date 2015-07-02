@@ -11,11 +11,13 @@ load('Avaritia\Library\Framework\View');
 load('Avaritia\Library\Framework\ServiceManager');
 load('Avaritia\Library\Framework\Request');
 load('Avaritia\Model\Order\OrderRepository');
+load('Avaritia\Library\Session');
 
 use Avaritia\Library\Framework\View;
 use Avaritia\Library\Framework\ServiceManager;
 use Avaritia\Library\Framework\Request;
 use Avaritia\Model\Order\OrderRepository;
+use Avaritia\Library\Session;
 
 // Поля класса
 const
@@ -81,6 +83,39 @@ function &indexAction(array &$Controller) {
 }
 
 /**
+ * Валидация данные в запросе добавления нового поста
+ *
+ * @param int $price стоимость
+ * @param string $text текст
+ * @param string $token токен
+ *
+ * @return bool|string true, если валидно, текст сообщения иначе
+ */
+function validateParams($price, $text, $token) {
+    if ($price < 1) {
+        return 'Стоимость должна быть больше 0';
+    }
+
+    if (mb_strlen($text) == 0) {
+        return 'Текст не должен быть пуст';
+    }
+
+    if (mb_strlen($text) > 1024) {
+        return 'Текст не может быть более 1024 символов';
+    }
+
+    if (is_null($token)) {
+        return 'Не токена';
+    }
+
+    if ($token !== Session\getToken()) {
+        return 'Неверный токен';
+    }
+
+    return true;
+}
+
+/**
  * Запрос на добавление заказа
  *
  * @param array &$Controller объект котнроллера
@@ -92,10 +127,13 @@ function cmdAdd(array &$Controller) {
 
     $price = (int) Request\getPostParam($Request, 'price');
     $text = Request\getPostParam($Request, 'text');
+    $token = Request\getPostParam($Request, 'token');
 
-    if (($price < 1) || (mb_strlen($text) == 0) || (mb_strlen($text) > 1024)) {
+    $isValid = validateParams($price, $text, $token);
+
+    if ($isValid !== true) {
         return [
-            'error_msg' => 'Неверные данные',
+            'errorMsg' => $isValid,
         ];
     }
 
@@ -103,7 +141,7 @@ function cmdAdd(array &$Controller) {
 
     if (OrderRepository\create($OrderRepository, $price, $text) === false) {
         return [
-            'error_msg' => 'Ошибка создания запроса',
+            'errorMsg' => 'Ошибка создания запроса',
         ];
     } else {
         return [];

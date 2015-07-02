@@ -162,9 +162,9 @@ function createInMysql(array $CustomerRepository, array $Customer, $passwordHash
         INSERT INTO ' . DATABASE_NAME . '.' . TABLE_NAME . '
           (id, login, fio, password_hash)
         VALUES (
-          \'' . mysql_real_escape_string(Customer\getId($Customer)) . '\',
-          \'' . mysql_real_escape_string(Customer\getLogin($Customer)) . '\',
-          \'' . mysql_real_escape_string(Customer\getFio($Customer)) . '\',
+          \'' . (int) Customer\getId($Customer) . '\',
+          \'' . Mysql\escape($Mysql, Customer\getLogin($Customer)) . '\',
+          \'' . Mysql\escape($Mysql, Customer\getFio($Customer)) . '\',
           \'' . $passwordHash . '\'
         )
     ');

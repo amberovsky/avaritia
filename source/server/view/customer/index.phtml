@@ -14,6 +14,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Avaritia</title>
     <link rel="stylesheet" href="css/vendor/bootstrap-3.3.5.min.css">
+    <link rel="stylesheet" href="css/avaritia/avaritia_<?=REVISION; ?>.css">
 </head>
 <body>
 <div class="container">
@@ -40,6 +41,27 @@
             </div>
         </div>
     </div>
+    <div class="row">
+
+    </div>
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <h2>Новый заказ</h2>
+            <div class="alert alert-success" id="successMessage"></div>
+            <div class="alert alert-danger" id="failMessage"></div>
+            <div class="form-group">
+                <textarea class="form-control" rows="3" id="text" placeholder="Текст (не более 1024 символа)"></textarea>
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control" id="price" placeholder="Цена (целое число в рублях)" pattern="a*">
+            </div>
+            <div class="form-group">
+                <input type="button" class="btn btn-success" id="saveOrder" value="Сохранить">
+            </div>
+            <input type="hidden" id="token" value="<?=Session\getToken(); ?>" />
+        </div>
+    </div>
+    <div class="loader modal fade"><i></i></div>
 </div>
 <!-- scripts -->
 <script src="js/vendor/jquery-2.1.4.min.js"></script>

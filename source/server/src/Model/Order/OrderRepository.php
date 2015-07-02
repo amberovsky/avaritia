@@ -114,12 +114,13 @@ function savePriceToMemcached(array $OrderRepository, $price) {
  * @param string $text текст заказа
  */
 function create(array &$OrderRepository, $price, $text) {
+    $Mysql = &getMysql($OrderRepository);
     Mysql\query(
-        getMysql($OrderRepository), '
+        $Mysql, '
         INSERT INTO ' . DATABASE_NAME . '.' . TABLE_NAME . '
             (price, text)
         VALUES
-            (' . (int) $price . ', ' . mysql_real_escape_string($text) . ')'
+            (' . (int) $price . ', \'' . Mysql\escape($Mysql, $text) . '\')'
     );
 
     savePriceToMemcached($OrderRepository, $price);
