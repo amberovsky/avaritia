@@ -136,7 +136,7 @@ function match(array &$Router) {
             }
 
             $Router[FIELD_ROUTE_NAME] = 'script';
-            setControllerName($Router, Request\getArgv($Request)[1]);
+            setControllerName($Router, ucfirst(Request\getArgv($Request)[1]));
             setActionName($Router, 'run');
             break;
 
