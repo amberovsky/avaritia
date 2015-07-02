@@ -89,6 +89,8 @@ var AvaritiaExecutor = {
 
     /**
      * Проверяет новые заказы и добавляет, если есть
+     *
+     * @return {AvaritiaExecutor}
      */
     checkNewOrders: function ($this) {
         api.cmd(
@@ -108,6 +110,8 @@ var AvaritiaExecutor = {
             },
             function (errorMsg) { $this.onRequestFail(errorMsg); }
         );
+
+        return $this;
     },
 
     /**
