@@ -123,7 +123,7 @@ function cmdExecute(array &$Controller) {
     $ActiveUser = ServiceManager\get($ServiceManager, 'ActiveUser');
     $Application = ServiceManager\get($ServiceManager, 'Application');
 
-    ExecutorRepository\updateSalary($ExecutorRepository, $ActiveUser, -$price - Application\getCommission($Application));
+    ExecutorRepository\updateSalary($ExecutorRepository, $ActiveUser, $price - Application\getCommission($Application));
 
     return [
         'salary'    => Executor\getSalary($ActiveUser),
