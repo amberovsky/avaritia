@@ -109,5 +109,5 @@ load('Avaritia\Library\Framework\Application');
 
 use Avaritia\Library\Framework\Application;
 
-$Application = Application\construct();
+$Application = &Application\construct();
 Application\run($Application);
