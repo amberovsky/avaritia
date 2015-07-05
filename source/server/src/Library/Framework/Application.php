@@ -74,7 +74,7 @@ function &construct() {
     $Response = &Response\construct($ServiceManager);
     ServiceManager\set($ServiceManager, 'Response', $Response);
 
-    ServiceManager\setInvokable($ServiceManager, 'ExecutorRepository', function (array &$ServiceManager) {
+    ServiceManager\setInvokable($ServiceManager, 'ExecutorRepository', function & (array &$ServiceManager) {
         $ExecutorRepository = &ExecutorRepository\construct(
             MemcachedFactory\create(ServiceManager\getFactory($ServiceManager, 'Memcached'), 'cache'),
             ServiceManager\getFactory($ServiceManager, 'Mysql')
@@ -83,7 +83,7 @@ function &construct() {
         return $ExecutorRepository;
     });
 
-    ServiceManager\setInvokable($ServiceManager, 'CustomerRepository', function (array &$ServiceManager) {
+    ServiceManager\setInvokable($ServiceManager, 'CustomerRepository', function & (array &$ServiceManager) {
         $CustomerRepository = &CustomerRepository\construct(
             MemcachedFactory\create(ServiceManager\getFactory($ServiceManager, 'Memcached'), 'cache'),
             ServiceManager\getFactory($ServiceManager, 'Mysql')
@@ -92,7 +92,7 @@ function &construct() {
         return $CustomerRepository;
     });
 
-    ServiceManager\setInvokable($ServiceManager, 'OrderRepository', function (array &$ServiceManager) {
+    ServiceManager\setInvokable($ServiceManager, 'OrderRepository', function & (array &$ServiceManager) {
         $OrderRepository = &OrderRepository\construct(
             MemcachedFactory\create(ServiceManager\getFactory($ServiceManager, 'Memcached'), 'cache'),
             MysqlFactory\create(ServiceManager\getFactory($ServiceManager, 'Mysql'), 'order')

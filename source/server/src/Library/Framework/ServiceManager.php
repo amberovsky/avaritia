@@ -98,7 +98,8 @@ function &get(array &$ServiceManager, $name) {
         return $ServiceManager[FIELD_DATA][$name];
     }
 
-    return null;
+    $Object = null;
+    return $Object;
 }
 
 /**
